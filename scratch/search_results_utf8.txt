@@ -1,0 +1,973 @@
+Line 2: Source: https://docs.genlayer.com
+Line 6: Intelligent Contracts interpret language, process unstructured data, and pull live web inputs. No oracles, no intermediaries.
+Line 12: The agentic-commerce stack is being built in public — Coinbase's [x402](https://www.x402.org/) for payments, Ethereum's [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) for trustless agent identity, the Linux Foundation's [A2A](https://a2a-protocol.org) for agent interoperability, plus Stripe/OpenAI's ACP, Visa's Trusted Agent Protocol, Google's AP2, and Mastercard's Agent Pay. Every layer engineers the happy path. None ships dispute resolution. GenLayer fills that gap.
+Line 17: > **Start with Skills 🤖** — The fastest way to build a contract or run a validator is the [GenLayer Skills](https://skills.genlayer.com/) plugin for Claude Code. One command scaffolds, deploys, and operates — no manual setup.
+Line 32: Join the community on [Discord](https://discord.gg/8Jm4v89VAu) or [Telegram](https://t.me/genlayer) to ask questions, share feedback, and showcase your builds.
+Line 34: We're hiring — [see open roles](https://x.com/GenLayer/jobs).
+Line 40: GenLayer is the first AI-native blockchain built for AI-powered smart contracts—called Intelligent Contracts—capable of reasoning and adapting to real-world data. Its foundation is the Optimistic Democracy consensus mechanism, an enhanced Delegated Proof of Stake (dPoS) model where validators connect directly to Large Language Models (LLMs). This setup allows for non-deterministic operations—such as processing text prompts, fetching live web data, and executing AI-based decision-making—while preserving the reliability and security of a traditional blockchain.
+Line 68: Source: https://docs.genlayer.com/understand-genlayer-protocol
+Line 70: Optimistic Democracy is GenLayer's consensus mechanism for merging probabilistic AI systems with deterministic blockchain rules so the network can reach secure and accurate consensus at scale. Inspired by **[Condorcet's Jury Theorem](https://jury-theorem.genlayer.com/)** (click the link to check out our interactive model), the process uses validator recomputation and majority agreement as a safety net for AI-driven computations.
+Line 75: A user sends a transaction request to the network (see the diagram's Step 1).
+Line 78: The network selects a Leader, who processes the request and proposes an outcome (Step 2).
+Line 98: 2. **Non-Deterministic Transactions** that leverage AI-driven logic (e.g., searching the internet, analyzing data, making probabilistic inferences).
+Line 108: Source: https://docs.genlayer.com/understand-genlayer-protocol/what-is-genlayer
+Line 114: Intelligent Contracts interpret language, process unstructured data, and pull live web inputs. No oracles, no intermediaries.
+Line 128: | Payments | [x402](https://www.x402.org/) (Coinbase) | Internet-native, agent-friendly payments | Not specified |
+Line 129: | Identity & reputation | [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) (Ethereum) | Trustless agent identity | Delegated to external validation protocols |
+Line 130: | Agent interoperability | [A2A](https://a2a-protocol.org) (Linux Foundation / Google) | How agents discover each other and exchange tasks | Not defined within the protocol |
+Line 143: ### Internet Access
+Line 144: Fetch live web data directly on-chain. Contracts can read websites, call APIs, and verify real-world information without oracles or intermediaries.
+Line 150: Pass images to LLMs for analysis — screenshot a webpage and verify its content, check visual evidence for claims, analyze receipts or documents. Contracts can capture screenshots via `gl.nondet.web.render()` and send them to LLMs via `gl.nondet.exec_prompt(images=[...])`.
+Line 160: | **Data sources** | On-chain only (or oracles) | On-chain + live web data |
+Line 171: **GenVM** — the execution environment for Intelligent Contracts. A WebAssembly-based VM (built on [Wasmtime](https://wasmtime.dev)) that runs a Python interpreter with native access to LLMs, web data, and non-deterministic operations. Can also execute compiled native code.
+Line 173: Every Intelligent Contract has a corresponding **ghost contract** on the chain layer at the same address. Ghost contracts hold the contract's GEN balance, relay transactions to consensus, and execute external messages. See [Messages](/developers/intelligent-contracts/features/messages#ghost-contracts) for details.
+Line 193: def ask_for_coin(self, request: str) -> None:
+Line 199: An adventurer says: {request}
+Line 229: Source: https://docs.genlayer.com/understand-genlayer-protocol/optimistic-democracy-how-genlayer-works
+Line 235: GenLayer uses **Optimistic Democracy** for consensus — a mechanism where validators running diverse AI models independently evaluate transactions and vote on outcomes. It applies [Condorcet's Jury Theorem](https://en.wikipedia.org/wiki/Condorcet%27s_jury_theorem): a group of independent reasoners is more likely to reach the correct answer than any individual. This is what lets GenLayer act as an **adjudication layer** for the agentic economy — judgments emerge from a diverse validator set rather than from any one model, operator, or jurisdiction.
+Line 257: Because Intelligent Contracts use LLMs and web data, validators may produce different outputs for the same input. GenLayer provides several strategies for reaching consensus on non-deterministic results:
+Line 280: Source: https://docs.genlayer.com/understand-genlayer-protocol/typical-use-cases
+Line 305: GenLayer plugs into the infrastructure the industry is building right now: payment rails ([x402](https://www.x402.org/)), agent identity and reputation ([ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)), agent-to-agent task exchange ([A2A](https://a2a-protocol.org)), plus Stripe/OpenAI's ACP, Visa's Trusted Agent Protocol, Google's AP2, and Mastercard's Agent Pay. Each standard ships the happy path and carves the moment of disagreement out as someone else's problem. GenLayer is that someone else.
+Line 327: - **Insurance** — parametric and evidence-based claims evaluated by AI validators. Contracts fetch weather data, flight statuses, or photographic evidence to assess claims and trigger payouts automatically — no adjusters, no weeks of waiting.
+Line 338: - Fetch and interpret live web data
+Line 343: See [projects building on GenLayer](https://portal.genlayer.foundation/#/) for live examples.
+Line 350: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts
+Line 367: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/validators-and-validator-roles
+Line 396: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/genvm
+Line 400: [Source code at GitHub](https://github.com/genlayerlabs/genvm)
+Line 406: In summary, the GenVM plays a crucial role in enabling GenLayer's unique features, bridging the gap between traditional smart contracts and AI-powered, web-connected Intelligent Contracts.
+Line 413: - **Web access**: the GenVM provides access to the Internet
+Line 428: - Implement proper error handling for web data access
+Line 434: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy
+Line 436: Optimistic Democracy is GenLayer's consensus method for validating transactions and operations of Intelligent Contracts. It is designed to handle unpredictable outcomes from transactions involving web data or AI models, helping keep the network reliable and secure.
+Line 456: 3. **Initiating an Appeal:** If a participant disagrees with the initial validation (if it's incorrect or fraudulent), they can appeal during the Finality Window. They must submit a request and provide a bond. After the appeal starts, a new group of validators joins the original ones. This group first votes on whether the transaction should be re-evaluated. If they agree, a new leader is chosen to reassess the transaction, and all validators then review this new evaluation.
+Line 467: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/equivalence-principle
+Line 469: The Equivalence Principle mechanism is a cornerstone in ensuring that Intelligent Contracts function consistently across various validators when handling non-deterministic outputs like responses from Large Language Models (LLMs) or data retrieved through web browsing. It plays a crucial role in how validators assess and agree on the outcomes proposed by the Leader.
+Line 477: - **Consistency in Decentralized Outputs:** The Equivalence Principle allows outputs from various sources, such as LLMs or web data, to be different yet still considered valid as long as they meet predefined standards. This is essential to maintain fairness and uniform decision-making across the blockchain, despite the natural differences in AI-generated responses or web-sourced information.
+Line 516: - **Ensuring Contract Reliability:** By clearly defining equivalence, developers help maintain the reliability and predictability of their contracts, even when those contracts interact with the unpredictable web or complex AI models.
+Line 521: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/appeal-process
+Line 527: - **Initiating an Appeal**: Participants can appeal the initial decision by submitting a request and a required bond during the Finality Window. A new set of validators is then added to the original group to reassess the transaction.
+Line 542: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/finality
+Line 566: Non-deterministic contracts involve Large Language Model (LLM) calls or web data retrieval, which introduce variability in their outcomes. These contracts require a longer Finality Window to account for potential appeals and re-computation.
+Line 585: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/staking
+Line 614: Every validator involves three distinct entities. Two of them are **keys** (regular externally owned accounts) and one is a **smart contract** — a distinction that matters when you plan key management:
+Line 629: **Owner key** — the wallet that calls `validatorJoin()` (the `msg.sender`) becomes the owner. This is an external wallet that you create and safeguard yourself — **the node never generates, stores, or needs it, and it cannot be extracted from a validator server**. The owner controls everything related to funds and administration:
+Line 645: | **What it is** | External wallet (EOA) | External wallet (EOA) | Smart contract (no key) |
+Line 941: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/slashing
+Line 970: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/optimistic-democracy/unstaking
+Line 979: 2. **Validator Removal**: Once the unstaking request is made, the validator is promptly removed from the pool of active validators, meaning they will no longer receive new transactions or be called upon for appeal validations.
+Line 1002: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/rollup-integration
+Line 1049: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/non-deterministic-operations-handling
+Line 1051: Non-deterministic operations handling in GenLayer is the process of maintaining network consensus when Intelligent Contracts produce variable results from actions such as interacting with Large Language Models (LLMs) or accessing web data. GenLayer addresses this variability through the Equivalence Principle, where validators assess whether different outputs are equivalent based on predefined criteria, and Optimistic Democracy, which supports provisional transaction acceptance with an appeals process.
+Line 1055: GenLayer extends traditional smart contracts by allowing Intelligent Contracts to perform non-deterministic operations, such as interacting with Large Language Models (LLMs) and accessing web data. Handling the variability inherent in these operations is crucial for maintaining consensus across the network.
+Line 1075: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/large-language-model-llm-integration
+Line 1090: 1. **LLM Providers**: Validators are configured with LLM providers (e.g., OpenAI, Ollama) to process LLM requests.
+Line 1101: # Web Data Access in Intelligent Contracts
+Line 1102: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/web-data-access
+Line 1104: Web Data Access in Intelligent Contracts is GenLayer's capability for contracts to directly retrieve and use web data without relying on oracles. This enables blockchain applications to respond to real-world events while validators use equivalence validation to check retrieved data for consistency.
+Line 1108: GenLayer enables Intelligent Contracts to directly access and interact with web data, removing the need for oracles and allowing for real-time data integration into blockchain applications.
+Line 1112: - **Direct Web Access**: Contracts can retrieve data from web sources.
+Line 1113: - **Dynamic Applications**: Access to web data allows for applications that respond to external events and real-world data.
+Line 1118: 1. **Data Retrieval Functions**: GenLayer provides mechanisms for fetching web data within contracts.
+Line 1119: 2. **Data Parsing and Validation**: Contracts must parse web data and validate it according to defined equivalence criteria.
+Line 1124: - **Network Dependencies**: Reliance on external web sources introduces dependencies that may affect contract execution.
+Line 1125: - **Performance Impact**: Web data retrieval may introduce latency and affect transaction processing times.
+Line 1130: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions
+Line 1164: "api_url": null
+Line 1198: "api_url": null
+Line 1254: - api_url: API URL for the given provider
+Line 1278: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/types-of-transactions
+Line 1376: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/transaction-statuses
+Line 1406: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/transaction-execution
+Line 1413: In the journey of a transaction within the GenLayer protocol, it begins its life when an Externally Owned Account (EOA) submits it, entering the `Pending` state. Here, it awaits further processing unless it encounters an `OutOfFee` state due to insufficient fees. If the fees are topped up, it returns to `Pending`. Alternatively, the user can cancel the transaction, moving it to the `Canceled` state.
+Line 1447: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/transactions/transaction-encoding-serialization-and-signing
+Line 1455: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/economic-model
+Line 1483: Source: https://docs.genlayer.com/understand-genlayer-protocol/core-concepts/accounts-and-addresses
+Line 1485: Accounts in GenLayer are entities that can hold tokens, deploy Intelligent Contracts, and initiate transactions on the network. GenLayer supports Externally Owned Accounts controlled by private keys and Contract Accounts associated with deployed Intelligent Contracts, each using addresses typically represented as `0x`-prefixed hexadecimal strings.
+Line 1493: 1. **Externally Owned Accounts (EOAs)**:
+Line 1519: Source: https://docs.genlayer.com/developers
+Line 1525: The fastest path from zero to deployed contract is the [GenLayer Skills](https://skills.genlayer.com/) plugin for Claude Code. The `genlayer-dev` skill scaffolds a project, runs the linter and direct-mode tests, deploys to testnet, and walks you through the SDKs interactively.
+Line 1572: Source: https://docs.genlayer.com/developers/networks
+Line 1588: | **GenLayer RPC** | `https://rpc-bradbury.genlayer.com` |
+Line 1589: | **GenLayer Chain RPC** | `https://rpc.testnet-chain.genlayer.com` |
+Line 1592: | **Explorer** | [explorer-bradbury.genlayer.com](https://explorer-bradbury.genlayer.com) |
+Line 1593: | **Chain Explorer** | [explorer.testnet-chain.genlayer.com](https://explorer.testnet-chain.genlayer.com/) |
+Line 1594: | **Faucet** | [testnet-faucet.genlayer.foundation](https://testnet-faucet.genlayer.foundation) |
+Line 1604: | **GenLayer RPC** | `https://rpc-asimov.genlayer.com` |
+Line 1605: | **GenLayer Chain RPC** | `https://rpc.testnet-chain.genlayer.com` |
+Line 1608: | **Explorer** | [explorer-asimov.genlayer.com](https://explorer-asimov.genlayer.com) |
+Line 1609: | **Chain Explorer** | [explorer.testnet-chain.genlayer.com](https://explorer.testnet-chain.genlayer.com/) |
+Line 1610: | **Faucet** | [testnet-faucet.genlayer.foundation](https://testnet-faucet.genlayer.foundation) |
+Line 1620: | **GenLayer RPC** | `https://studio.genlayer.com/api` |
+Line 1623: | **Explorer** | [explorer-studio.genlayer.com](https://explorer-studio.genlayer.com) |
+Line 1634: | **GenLayer RPC** | `http://localhost:4000/api` |
+Line 1637: | **Explorer** | Bundled with Studio at `http://localhost:8080` |
+Line 1648: | **RPC** | `https://rpc.testnet-chain.genlayer.com` |
+Line 1651: | **Explorer** | [explorer.testnet-chain.genlayer.com](https://explorer.testnet-chain.genlayer.com/) |
+Line 1663: | **Faucet** | [Available](https://testnet-faucet.genlayer.foundation) | [Available](https://testnet-faucet.genlayer.foundation) | Built-in (💧 button) | Built-in (💧 button) |
+Line 1667: 1. **Start on Studionet** — zero setup, open [studio.genlayer.com](https://studio.genlayer.com)
+Line 1674: Source: https://docs.genlayer.com/developers/intelligent-contracts/introduction
+Line 1678: Intelligent Contracts are an advanced evolution of smart contracts that combine traditional blockchain capabilities with natural language processing and web connectivity. Built in Python, they enable developers to create contracts that can understand human language, process external data, and make complex decisions based on real-world information.
+Line 1687: ### Web Connectivity
+Line 1688: These contracts can actively interact with web APIs to fetch real-time information, enabling dynamic decision-making based on current data. By incorporating external services for data verification, they maintain a reliable connection to real-world events and conditions, bridging the gap between on-chain and off-chain environments.
+Line 1740: ### External Data Integration
+Line 1741: Intelligent Contracts can seamlessly integrate with external data sources, providing direct access to real-world information without intermediate layers. Their real-time data processing capabilities ensure that contract decisions are based on current and accurate information.
+Line 1752: Intelligent Contracts introduce non-determinism and external dependencies that traditional smart contracts avoid. Key considerations:
+Line 1754: - **Non-deterministic outputs** — LLM responses and web data vary across validators. The [Equivalence Principle](/developers/intelligent-contracts/features/non-determinism) lets you define how validators compare results to reach consensus.
+Line 1755: - **External data reliability** — Web sources can be inconsistent or unavailable. Multiple validators independently fetch and cross-validate data as part of [Optimistic Democracy](/understand-genlayer-protocol/optimistic-democracy-how-genlayer-works).
+Line 1756: - **Compute cost** — LLM calls and web requests add latency and cost compared to purely deterministic contracts. Design contracts to minimize non-deterministic calls where possible.
+Line 1761: Source: https://docs.genlayer.com/developers/intelligent-contracts/when-to-use-genlayer
+Line 1773: - **The evidence can be independently checked**: validators can fetch the same source material or enough comparable evidence to verify the leader's result.
+Line 1783: 1. **Frontend or backend**: collects user intent, displays data, handles indexing, and may prepare URLs or evidence.
+Line 1826: If your frontend fetches data, asks an LLM for the answer, and sends the finished result to GenLayer for storage, GenLayer is not adding much trust.
+Line 1840: Better pattern: commit to public evidence, signed attestations, hashes, URLs, or other verifiable inputs that validators can inspect.
+Line 1853: - **Evidence sources**: stable URLs, APIs, signed data, user submissions, or other material validators can fetch or evaluate.
+Line 1883: Source: https://docs.genlayer.com/developers/intelligent-contracts/features
+Line 1885: Intelligent Contract Features catalogs the deterministic and non-deterministic capabilities available when building GenLayer Intelligent Contracts, from storage, messages, value transfers, and contract interactions to LLM calls, image processing, and web access.
+Line 1907: - [🌏 Web Access](features/web-access)
+Line 1912: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/storage
+Line 2030: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/error-handling
+Line 2153: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/upgradability
+Line 2320: See [GenVM specification](https://sdk.genlayer.com/v0.2.7/spec/04-contract-interface/04-upgradability.html) for the full technical details.
+Line 2325: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/value-transfers
+Line 2384: Sending to an address on the GenLayer Chain (EOA or EVM contract) is an [external message](/developers/intelligent-contracts/features/messages#external-messages-ic--chain-layer). It goes through the IC's [ghost contract](/developers/intelligent-contracts/features/messages#ghost-contracts) and always executes on finalization.
+Line 2404: > The syntax for sending to an EOA uses the EVM contract interface even though the recipient is not a contract. This is because EOAs live on the chain layer, making this an external message — the same mechanism used for calling EVM contracts. This will be simplified in a future version.
+Line 2477: | Testnet Asimov | [testnet-faucet.genlayer.foundation](https://testnet-faucet.genlayer.foundation/) |
+Line 2478: | Testnet Bradbury | [testnet-faucet.genlayer.foundation](https://testnet-faucet.genlayer.foundation/) |
+Line 2506: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/transaction-context
+Line 2616: - **No block number, no block hash.** The transaction context does not carry block-level metadata. If your contract needs block height, fetch it via [Web Access](/developers/intelligent-contracts/features/web-access) against an RPC inside a non-deterministic block.
+Line 2623: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/messages
+Line 2625: Messages in GenLayer are interactions that move execution between callers, Intelligent Contracts, the GenVM layer, and the GenLayer Chain. GenLayer has three types of interaction, each operating at a different layer of the architecture: transactions that start Intelligent Contract execution, internal messages between Intelligent Contracts, and external messages from an Intelligent Contract to the chain layer.
+Line 2672: ## External Messages (IC → Chain Layer)
+Line 2674: An external message crosses from the GenVM layer back to the GenLayer Chain (EVM layer). This is how an IC sends value or calls an EOA or EVM contract.
+Line 2676: External messages are executed by the IC's ghost contract via `handleOp()`, so the `msg.sender` seen by the recipient is the ghost contract address (which is the same as the IC's address).
+Line 2704: > External messages can only be emitted `on='finalized'`. Using `on='accepted'` for external messages is not supported.
+Line 2717: - **Execute external messages** — on finalization, `handleOp()` forwards calls to recipients so `msg.sender` is the IC's address
+Line 2757: External messages always use `on='finalized'` and cannot be emitted on acceptance.
+Line 2809: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/interacting-with-intelligent-contracts
+Line 2915: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/interacting-with-evm-contracts
+Line 2919: > These are external messages — they cross from the GenVM layer back to the GenLayer Chain via [ghost contracts](/developers/intelligent-contracts/features/messages#ghost-contracts). See [Messages](/developers/intelligent-contracts/features/messages) for the conceptual model.
+Line 2974: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/special-methods
+Line 3029: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/vector-storage
+Line 3131: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/debugging
+Line 3163: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/random
+Line 3190: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/non-determinism
+Line 3192: Non-determinism in Intelligent Contracts is any operation whose result can vary between nodes, such as external API calls, LLM and AI model calls, random number generation, or other variable execution. GenVM requires these operations to run inside nondeterministic blocks so validators can reach consensus on the agreed result before deterministic side effects occur.
+Line 3197: - External API calls
+Line 3208: All `gl.nondet.*` calls — web requests, LLM prompts — must be inside a nondet block. They cannot run in regular contract code.
+Line 3212: def fetch_price(self):
+Line 3214: response = gl.nondet.web.get(api_url)          # ✓ inside nondet block
+Line 3218: # gl.nondet.web.get(api_url)                        # ✗ would fail here
+Line 3237: response = gl.nondet.web.get(api_url)
+Line 3270: Requires exact matches between validator outputs. Use when all nodes can converge on the same normalized value — e.g., fetching objective data from an API and extracting a structured result:
+Line 3273: def fetch_current_block():
+Line 3274: response = gl.nondet.web.request("https://api.example.com/block/latest")
+Line 3279: result = gl.eq_principle.strict_eq(fetch_current_block)
+Line 3290: return gl.nondet.web.request("https://api.example.com/count")
+Line 3339: ### Accessing External Data
+Line 3341: Use non-deterministic blocks for external API calls. For more web access examples, see [Web Access](/developers/intelligent-contracts/features/web-access):
+Line 3345: def fetch_external_data(self):
+Line 3346: def fetch_data():
+Line 3347: # External API call - inherently non-deterministic
+Line 3348: response = gl.nondet.web.request("https://example.com/data")
+Line 3352: data = gl.eq_principle.strict_eq(fetch_data)
+Line 3378: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/calling-llms
+Line 3380: Calling LLMs in Intelligent Contracts uses `gl.nondet.exec_prompt` to execute prompts, request JSON responses, process image inputs, and return model output through `run_nondet_unsafe` with custom validation. Because LLM outputs are non-deterministic, validators should check response structure, validity, and error behavior instead of requiring exact equality.
+Line 3402: Request structured responses from LLMs:
+Line 3560: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/image-processing
+Line 3599: ## Capturing Screenshots from the Web
+Line 3601: Combine [web access](/developers/intelligent-contracts/features/web-access) with image processing to screenshot a webpage and analyze it:
+Line 3604: def check_website_status():
+Line 3605: url = "https://example.com/status-page"
+Line 3606: screenshot = gl.nondet.web.render(url, mode='screenshot')
+Line 3615: result = gl.eq_principle.strict_eq(check_website_status)
+Line 3622: - **Web monitoring** — screenshot a page and verify its content matches expectations
+Line 3631: # Web Access
+Line 3632: Source: https://docs.genlayer.com/developers/intelligent-contracts/features/web-access
+Line 3634: Web Access lets Intelligent Contracts fetch external data, send HTTP requests, render web pages, capture screenshots, and handle API errors from non-deterministic blocks. Because leaders and validators make independent web requests, use stable fields or derived summaries when applying the Equivalence Principle to web data.
+Line 3636: ## HTTP Requests
+Line 3638: Send data to external services:
+Line 3641: def post_request():
+Line 3642: url = "https://test-server.genlayer.com/body/echo"
+Line 3643: response = gl.nondet.web.request(
+Line 3644: url,
+Line 3650: status_code = gl.eq_principle.strict_eq(post_request)
+Line 3653: ## Web Rendering
+Line 3655: Render web page and extract content:
+Line 3659: url = "https://test-server.genlayer.com/static/genvm/hello.html"
+Line 3661: html_content = gl.nondet.web.render(url, mode='html')
+Line 3669: Take screenshots of web pages:
+Line 3673: url = "https://test-server.genlayer.com/static/genvm/hello.html"
+Line 3675: screenshot = gl.nondet.web.render(url, mode='screenshot')
+Line 3681: ## Handling HTTP Errors
+Line 3683: External APIs can return error responses. Consider checking the status code:
+Line 3686: def fetch_data():
+Line 3687: response = gl.nondet.web.request(api_url, method='GET')
+Line 3695: ## Consensus-Friendly Web Requests
+Line 3697: When using web data in non-deterministic blocks, remember that the leader and validators make **independent requests**. External APIs may return different data between calls — timestamps change, counts update, caches vary.
+Line 3705: res = gl.nondet.web.get(api_url)
+Line 3707: # Only return fields that are stable across requests
+Line 3736: Source: https://docs.genlayer.com/developers/intelligent-contracts/tooling-setup
+Line 3742: The [GenLayer Skills](https://skills.genlayer.com/) plugin for Claude Code is the fastest path to a working development environment. The `genlayer-dev` skill scaffolds a project, installs prerequisites, runs the linter and direct-mode tests, and walks you through deployment — interactively.
+Line 3755: The fastest way to start is [studio.genlayer.com](https://studio.genlayer.com) — a web-based IDE where you can write, deploy, and interact with Intelligent Contracts with zero setup.
+Line 3765: - [Python 3.12+](https://www.python.org/downloads/): For contracts, linting, and testing
+Line 3766: - [Node.js 18+](https://nodejs.org/en/download/): For GenLayer CLI and frontend
+Line 3767: - [Docker 26+](https://docs.docker.com/get-docker/): For GenLayer Studio (local)
+Line 3774: The [GenLayer Project Boilerplate](https://github.com/genlayerlabs/genlayer-project-boilerplate) is the recommended starting point. It includes contract templates, testing infrastructure, and a frontend scaffold.
+Line 3777: git clone https://github.com/genlayerlabs/genlayer-project-boilerplate.git
+Line 3872: #### Mocking Web and LLM Calls
+Line 3874: For contracts that use `gl.nondet.web` or `gl.nondet.exec_prompt`, mock the responses:
+Line 3881: # Mock web requests (regex matches on URL)
+Line 3882: direct_vm.mock_web(
+Line 3958: # Your frontend connects to http://localhost:4000/api
+Line 3975: Once running, access Studio at http://localhost:8080/. Your frontend and tests connect to `http://localhost:4000/api`.
+Line 4027: The [GenLayer VS Code Extension](https://marketplace.visualstudio.com/items?itemName=genlayer-labs.genlayer) provides syntax highlighting, snippets, and language support for Intelligent Contracts. Works with VS Code, Cursor, and other VS Code-compatible editors.
+Line 4033: For Claude Code, install the [GenLayer Skills](https://skills.genlayer.com/) marketplace (covered at the top of this page) — it bundles the workflows below behind interactive commands.
+Line 4037: The [GenLayer MCP Server](https://www.npmjs.com/package/genlayer-mcp) provides contract generation and GenLayer-specific guidance directly in your IDE:
+Line 4048: claude mcp add genlayer-docs --transport sse https://docs-mcp.genlayer.com/sse
+Line 4051: This is a hosted service — no local setup required. It provides a `search_docs` tool that searches across both the [GenLayer documentation](https://docs.genlayer.com) and the [GenLayer SDK reference](https://sdk.genlayer.com). Compatible with any MCP client (Claude Code, Cursor, Windsurf, etc.).
+Line 4074: const client = createClient({ endpoint: 'http://localhost:4000/api' });
+Line 4098: Source: https://docs.genlayer.com/developers/intelligent-contracts/first-contract
+Line 4180: Source: https://docs.genlayer.com/developers/intelligent-contracts/types/address
+Line 4203: `Address` exposes multiple read-only views for common encodings. Use these when you need a specific serialization for UI, storage, hashing, or interop with external systems.
+Line 4226: # Get base64 representation; useful for URLs and systems that prefer base64
+Line 4313: # Convert external input to Address so lookups match normalized keys
+Line 4327: Source: https://docs.genlayer.com/developers/intelligent-contracts/types/primitive
+Line 4493: Source: https://docs.genlayer.com/developers/intelligent-contracts/types/collections
+Line 4686: Source: https://docs.genlayer.com/developers/intelligent-contracts/types/dataclasses
+Line 4747: Source: https://docs.genlayer.com/developers/intelligent-contracts/storage
+Line 4963: Source: https://docs.genlayer.com/developers/intelligent-contracts/first-intelligent-contract
+Line 4970: To illustrate how non-deterministic blocks work, this example gets a webpage as plain HTML and verifies that it has a link to the owner:
+Line 4973: example_web_address = 'https://example.org'
+Line 4975: web_data = gl.nondet.web.render(example_web_address, mode='html')
+Line 4976: return 'iana' in web_data
+Line 4982: 1. It is **mandatory** to call `gl.nondet.web.render` (or `gl.nondet.web.get`) from a function invoked via `gl.eq_principle.*`, otherwise it will give an error
+Line 4984: 3. `example_web_address` gets captured without the need to specify it explicitly
+Line 4998: example_web_address = 'https://example.org'
+Line 5000: web_data = gl.nondet.web.render(example_web_address, mode='html')
+Line 5001: return 'iana' in web_data
+Line 5008: Source: https://docs.genlayer.com/developers/intelligent-contracts/equivalence-principle
+Line 5010: The Equivalence Principle is GenLayer's method for reaching consensus on non-deterministic operations, including web requests, LLM calls, or any computation that might produce different results on different nodes.
+Line 5039: - Re-run the same LLM/web task and compare the stable decision fields
+Line 5040: - Fetch the same source data and independently derive the status being stored
+Line 5055: # Fetch data, call an LLM, compute something
+Line 5086: > **Always extract before comparing.** Raw web data varies between nodes (caching, cookies, dynamic content) and is expensive to write to the GenLayer chain — whatever data the leader returns has to be stored on-chain. The typical pattern is: **fetch web data → LLM extraction → return structured data**, all within the same non-deterministic block.
+Line 5100: web_data = gl.nondet.web.get(match.source_url)
+Line 5104: Page content: {web_data.body}
+Line 5148: The most common use case — fetching a price that may drift between when the leader and validator execute:
+Line 5153: url = f"https://api.example.com/prices/{pair}"
+Line 5156: response = gl.nondet.web.get(url)
+Line 5183: web_data = gl.nondet.web.get(submission.content_url)
+Line 5187: Content: {web_data.body}
+Line 5241: web_data = gl.nondet.web.get(event.source_url)
+Line 5246: Page content: {web_data.body}
+Line 5321: def summarize_article(self, url: str):
+Line 5323: lambda: gl.nondet.web.get(url).body.decode("utf-8"),
+Line 5331: self.summaries[url] = result
+Line 5345: def summarize_article(self, url: str):
+Line 5354: web_data = gl.nondet.web.get(url).body.decode("utf-8")
+Line 5360: 'input': web_data,
+Line 5371: web_data = gl.nondet.web.get(url).body.decode("utf-8")
+Line 5377: 'input': web_data,
+Line 5386: self.summaries[url] = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
+Line 5427: When your contract makes external calls that can fail in different ways, you may want to classify errors and handle each type differently. With `run_nondet_unsafe`, you implement this inside the validator:
+Line 5431: ERROR_EXTERNAL = "[EXTERNAL]"    # External API errors (deterministic)
+Line 5444: if validator_msg.startswith(ERROR_EXPECTED) or validator_msg.startswith(ERROR_EXTERNAL):
+Line 5466: - **Expected/external errors** (e.g., "issue not found"): must match exactly
+Line 5496: def fetch_match_result():
+Line 5497: web_data = gl.nondet.web.get(resolution_url)
+Line 5500: Page: {web_data.body}
+Line 5506: result = json.loads(gl.eq_principle.strict_eq(fetch_match_result))
+Line 5535: lambda: gl.nondet.web.get(url).body.decode("utf-8"),
+Line 5597: Source: https://docs.genlayer.com/developers/intelligent-contracts/debugging
+Line 5630: - Analyze LLM or web data interactions for discrepancies or timeouts
+Line 5638: Source: https://docs.genlayer.com/developers/intelligent-contracts/testing
+Line 5640: The [GenLayer Testing Suite](https://pypi.org/project/genlayer-test/) (`genlayer-test`) is a pytest-based framework for testing Intelligent Contracts. It provides two execution modes to match your workflow.
+Line 5656: | **Mocking**       | `mock_web` / `mock_llm` cheatcodes        | Mock validators with LLM/web responses           |
+Line 5746: ### Mocking Web and LLM Calls
+Line 5748: Non-deterministic calls (`gl.nondet.web`, `gl.nondet.exec_prompt`) must be mocked in Direct Mode. Use regex patterns to match URLs and prompt text.
+Line 5752: # Mock a web response (regex pattern matches the URL)
+Line 5753: direct_vm.mock_web(
+Line 5833: For the full Studio Mode API -- mock validators, LLM/web responses, multi-network configuration -- see the [genlayer-test API Reference](/api-references/genlayer-test).
+Line 5841: 2. **Mock non-deterministic calls** -- add `mock_web` / `mock_llm` to test the full execution flow with controlled outputs. Cover both happy paths and edge cases (empty responses, unexpected LLM output, HTTP errors).
+Line 5853: Source: https://docs.genlayer.com/developers/intelligent-contracts/deploying
+Line 5931: 3. **Build Frontend**: Integrate with your deployed contracts using [GenLayerJS](https://github.com/yeagerai/genlayer-js)
+Line 5939: Source: https://docs.genlayer.com/developers/intelligent-contracts/deploying/deployment-methods
+Line 5994: Source: https://docs.genlayer.com/developers/intelligent-contracts/deploying/network-configuration
+Line 6003: - **URL**: `http://localhost:4000/api` (default)
+Line 6006: - No external dependencies
+Line 6027: - **Setup**: Accessible through [studio.genlayer.com/api](https://studio.genlayer.com)
+Line 6084: Before deploying to TestnetBradbury, you'll need testnet tokens. Use the [faucet](https://testnet-faucet.genlayer.foundation/) to get free GEN tokens.
+Line 6182: "rpcUrls": {
+Line 6209: Source: https://docs.genlayer.com/developers/intelligent-contracts/deploying/cli-deployment
+Line 6223: - `--rpc <rpcUrl>`: Custom RPC URL (optional)
+Line 6248: genlayer deploy --contract contracts/my_contract.py --rpc http://localhost:4000/api
+Line 6251: genlayer deploy --contract contracts/my_contract.py --rpc https://studio.genlayer.com/api
+Line 6254: genlayer deploy --rpc https://custom-network.com/api
+Line 6335: Source: https://docs.genlayer.com/developers/intelligent-contracts/deploying/deploy-scripts
+Line 6590: Source: https://docs.genlayer.com/developers/intelligent-contracts/crafting-prompts
+Line 6592: Prompt and data techniques for Intelligent Contracts are practices for getting reliable LLM reasoning, web data, and programmatic logic to work together. Use structured outputs, stable data extraction, and verified facts to make LLM judgments easier to validate.
+Line 6602: An adventurer says: {request}
+Line 6624: ## Extract Stable Fields from Web Data
+Line 6626: When fetching external data for consensus, the leader and validators make **independent requests**. API responses often contain fields that change between calls — timestamps, view counts, caching headers. Extract only the fields that matter:
+Line 6630: response = gl.nondet.web.get(github_api_url)
+Line 6632: # Only return fields that are stable across requests
+Line 6647: This is the #1 cause of failed consensus for new developers. If your contract fetches web data and consensus keeps failing, check whether you're returning unstable fields.
+Line 6655: url = f"https://api.github.com/repos/{repo}/commits/{commit_hash}/check-runs"
+Line 6658: response = gl.nondet.web.get(url)
+Line 6787: ERROR_EXTERNAL = "[EXTERNAL]"   # API/network failures (non-deterministic)
+Line 6794: raise ValueError(f"{ERROR_EXTERNAL} GitHub API returned {response.status}")
+Line 6797: `[EXPECTED]` errors mean the transaction should fail consistently across all nodes. `[EXTERNAL]` errors mean the external service had a problem — the transaction may succeed on retry.
+Line 6800: > For a comprehensive guide on prompt engineering, see the [Prompt Engineering Guide from Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview).
+Line 6805: Source: https://docs.genlayer.com/developers/intelligent-contracts/security-and-best-practices/prompt-injection
+Line 6830: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/storage
+Line 6899: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/user-storage
+Line 6976: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/llm-hello-world
+Line 7081: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/llm-hello-world-non-comparative
+Line 7151: - Execute the AI prompt requesting a truthy Python value
+Line 7181: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/wizard-of-coin
+Line 7198: def ask_for_coin(self, request: str) -> None:
+Line 7207: Adventurer: {request}
+Line 7241: You can check out this code on our [GitHub](https://github.com/genlayerlabs/genlayer-studio/blob/main/examples/contracts/wizard_of_coin.py)
+Line 7245: To deploy the Wizard of Coin contract, you'll need to first initialize the contract state correctly. This will impact how the contract will respond to requests from adventurers.
+Line 7251: 2. Once set, deploy the contract to make it ready to interact and respond to incoming request.
+Line 7264: To interact with the deployed contract, go to the **Write Methods** section. Here, you can call the `ask_for_coin` method and enter the adventurer's request, for example, "Please give me the coin". Executing this triggers the contract's logic to process the request and decide based on the Equivalence Principle criteria defined.
+Line 7266: ![Deploy Contract](/request-string-wizard.png)
+Line 7272: - The LLM processes the adventurer's request.
+Line 7278: - **Wizard Retains the Coin:** Typically, the wizard will not give the coin if he has it (`have_coin` is `True`). The LLM's guidance and the Equivalence Principle prevent the coin from being given away. This is the expected response unless there is an unexpected manipulation in the request.
+Line 7279: - **Coin Given Away:** If the result indicates that the wizard no longer has the coin, it suggests that the LLM was tricked by the request into giving out the coin.
+Line 7286: # FetchWebContent Contract
+Line 7287: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/fetch-web-content
+Line 7289: The FetchWebContent contract is an Intelligent Contract example that fetches web content, stores it in contract state, and uses the [comparative equivalence principle](/developers/intelligent-contracts/equivalence-principle#comparative-equivalence-principle) so all nodes agree on the same web content. The contract retrieves `https://example.com/`, decodes the response body as UTF-8 text, stores the result in `content`, and exposes it through `show_content()`.
+Line 7297: class FetchWebContent(gl.Contract):
+Line 7304: def fetch_web_content(self) -> typing.Any:
+Line 7306: def fetch_web_url_content() -> str:
+Line 7307: response = gl.nondet.web.get("https://example.com/")
+Line 7310: self.content = gl.eq_principle.strict_eq(fetch_web_url_content)
+Line 7319: - **Initialization**: The `FetchWebContent` class initializes with an empty string in the `content` variable.
+Line 7321: - `fetch_web_content()` retrieves content from a web page and stores it.
+Line 7322: - It contains an inner function `fetch_web_url_content()` that uses `gl.nondet.web.get()` to fetch content.
+Line 7325: - `show_content()` returns the stored web content.
+Line 7329: 1. **Web Integration**: The contract uses `gl.nondet.web.get()` to fetch content from web URLs.
+Line 7331: 3. **State Management**: The contract maintains a single string state variable that stores the web content.
+Line 7335: To deploy the FetchWebContent contract:
+Line 7344: - Use `show_content()` to view the currently stored web content.
+Line 7351: 1. Call `fetch_web_content()` to trigger the web content fetch.
+Line 7353: - Fetch the content from example.com
+Line 7357: ## Understanding Web Content Integration
+Line 7361: - **Web Fetching**: Shows how to safely retrieve content from web sources.
+Line 7362: - **Deterministic Results**: Uses the equivalence principle to ensure all nodes reach consensus on web content.
+Line 7363: - **State Updates**: Demonstrates how web content can be stored in blockchain state.
+Line 7368: - **After fetch_web_content()**: The content will contain the text from example.com.
+Line 7369: - **Multiple Calls**: Each call to `fetch_web_content()` will update the stored content.
+Line 7374: 1. This example uses example.com as a stable demonstration URL.
+Line 7375: 2. Web content should be relatively stable to ensure consensus.
+Line 7381: 1. Only fetch content from trusted and stable sources.
+Line 7382: 2. Be aware that web content can change over time.
+Line 7386: You can monitor the contract's behavior through transaction logs, which will show the fetched content and state updates as they occur.
+Line 7388: ## HTML Mode for Web Content
+Line 7390: The `gl.nondet.web.get()` function supports different modes for retrieving web content. While the default mode returns the plain text content, `gl.nondet.web.render()` with `mode="html"` allows you to retrieve the complete HTML `<body>` of the webpage.
+Line 7397: class FetchHTMLContent(gl.Contract):
+Line 7404: def fetch_html_content(self) -> typing.Any:
+Line 7405: def fetch_web_url_html() -> str:
+Line 7406: return gl.nondet.web.render("https://example.com/", mode='html')
+Line 7408: self.html_content = gl.eq_principle.strict_eq(fetch_web_url_html)
+Line 7421: - Analyzing webpage structure and metadata
+Line 7436: def fetch_rendered_text() -> str:
+Line 7437: return gl.nondet.web.render(
+Line 7438: "https://example.com/dynamic-page",
+Line 7446: - Prefer `gl.nondet.web.get()` for stable APIs and static pages.
+Line 7457: # FetchGitHubProfile Contract
+Line 7458: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/fetch-github-profile
+Line 7460: The FetchGitHubProfile contract is a GenLayer Intelligent Contract example that fetches a GitHub profile page and stores its content in contract state. The example shows how to use the [comparative Equivalence Principle](/developers/intelligent-contracts/equivalence-principle#comparative-equivalence-principle) so all nodes agree on the same profile content.
+Line 7468: class FetchGitHubProfile(gl.Contract):
+Line 7475: def fetch_github_profile(self, github_handle: str) -> typing.Any:
+Line 7476: github_profile_url = "https://github.com/"+github_handle
+Line 7478: def fetch_github_profile_page_content() -> str:
+Line 7479: response = gl.nondet.web.get(github_profile_url)
+Line 7482: self.github_profile = gl.eq_principle.strict_eq(fetch_github_profile_page_content)
+Line 7491: - **Initialization**: The `FetchGitHubProfile` class initializes with an empty string in the `github_profile` variable.
+Line 7493: - `fetch_github_profile(github_handle)` takes a GitHub username and retrieves their profile content.
+Line 7494: - Constructs the profile URL using the provided handle.
+Line 7501: 1. **GitHub Integration**: The contract uses `gl.nondet.web.get()` to fetch content from GitHub profiles.
+Line 7507: To deploy the FetchGitHubProfile contract:
+Line 7523: 1. Call `fetch_github_profile(github_handle)` with a GitHub username.
+Line 7525: - Construct the GitHub profile URL
+Line 7526: - Fetch the profile content
+Line 7534: - **Dynamic URLs**: Shows how to construct URLs based on input parameters.
+Line 7535: - **Web Fetching**: Demonstrates safe retrieval of content from GitHub.
+Line 7537: - **State Updates**: Shows how external web content can be stored in blockchain state.
+Line 7548: 1. This example fetches public GitHub profile pages only.
+Line 7560: You can monitor the contract's behavior through transaction logs, which will show the fetched profile content and state updates as they occur.
+Line 7565: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/github-profile-projects
+Line 7567: The GitHubProfilesRepositories contract is an Intelligent Contract example that fetches public GitHub profile data, extracts repository counts, and stores handles for developers with more than 25 repositories. The example demonstrates how to use the [comparative Equivalence Principle](/developers/intelligent-contracts/equivalence-principle#comparative-equivalence-principle) with pattern matching to process web content and reach consensus on the fetched repository count.
+Line 7584: github_profile_url = "https://github.com/"+github_handle
+Line 7586: def fetch_github_profile_repositories() -> int:
+Line 7587: response = gl.nondet.web.get(github_profile_url)
+Line 7588: profile_web_page = response.body.decode("utf-8")
+Line 7593: match = re.search(pattern, profile_web_page)
+Line 7601: repositories = gl.eq_principle.strict_eq(fetch_github_profile_repositories)
+Line 7623: 1. **GitHub Integration**: Uses `gl.nondet.web.get()` to fetch profile content.
+Line 7648: - Fetch the profile page content
+Line 7657: - **Web Scraping**: Shows how to extract specific data from web pages.
+Line 7658: - **Regular Expressions**: Demonstrates pattern matching in web content.
+Line 7695: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/github-profile-summary
+Line 7697: The GitHubProfilesSummaries contract is an Intelligent Contract example that fetches GitHub profile data, generates AI-powered summaries, and stores one summary per GitHub handle. The example demonstrates how to combine web scraping with AI analysis using both [comparative](/developers/intelligent-contracts/equivalence-principle#comparative-equivalence-principle) and [non-comparative](/developers/intelligent-contracts/equivalence-principle#non-comparative-equivalence-principle) equivalence principles.
+Line 7719: github_profile_url = "https://github.com/"+github_handle
+Line 7721: def fetch_github_profile_summaries() -> str:
+Line 7722: response = gl.nondet.web.get(github_profile_url)
+Line 7725: profile_content = gl.eq_principle.strict_eq(fetch_github_profile_summaries)
+Line 7727: task = """Given the web page content of a github profile in HTML format, generate a comprehensive
+Line 7759: 2. **Web Fetching**: Uses `gl.nondet.web.get()` with strict equivalence for deterministic content retrieval.
+Line 7784: - Fetch the profile content
+Line 7801: - **Invalid Profile**: Web content fetch would fail for non-existent profiles.
+Line 7807: 3. Profile content is fetched deterministically using strict equivalence.
+Line 7813: 2. Handle web content fetch failures gracefully.
+Line 7823: You can monitor the contract's behavior through transaction logs, which will show the profile fetches and summary generations as they occur.
+Line 7828: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/prediction
+Line 7845: resolution_url: str
+Line 7859: resolution_url (str): The URL to the game's resolution on BBC Sport.
+Line 7865: self.resolution_url = (
+Line 7866: "https://www.bbc.com/sport/football/scores-fixtures/" + game_date
+Line 7878: response = gl.nondet.web.get(self.resolution_url)
+Line 7879: web_data = response.body.decode("utf-8")
+Line 7880: print(web_data)
+Line 7882: task = f"""In the following web page, find the winning team in a matchup between the following teams:
+Line 7886: Web page content:
+Line 7887: {web_data}
+Line 7888: End of web page data.
+Line 7917: You can check out this code on our [GitHub](https://github.com/genlayerlabs/genlayer-studio/blob/main/examples/contracts/football_prediction_market.py)
+Line 7945: - The LLM retrieves the game data from the specified URL.
+Line 7960: Source: https://docs.genlayer.com/developers/intelligent-contracts/examples/vector-store-log-indexer
+Line 8126: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-cli
+Line 8215: [GenLayer CLI Repository](https://github.com/genlayerlabs/genlayer-cli)
+Line 8222: The GenLayer FAQ is a collection of useful questions and answers about the project. If you have a question that isn't answered here, please let us know on our [Discord](https://discord.gg/8Jm4v89VAu) .
+Line 8237: The GenLayer Studio is available at [studio.genlayer.com](https://studio.genlayer.com).
+Line 8243: - Go to [studio.genlayer.com](https://studio.genlayer.com) or use the [GenLayer CLI](/getting-started#installation-of-the-genlayer-cli) to start the GenLayer Studio locally.
+Line 8255: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio
+Line 8263: - **Access the Web Natively:** GenLayer is the first platform where Intelligent Contracts don’t need oracles to access the Internet.
+Line 8271: [Embedded content](https://www.youtube.com/embed/G4N-oErlIBI?si=ZkWRT6Ya2mjJWuP8)
+Line 8282: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/loading-contract
+Line 8320: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/deploying-contract
+Line 8350: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/contract-state
+Line 8376: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/execute-transaction
+Line 8388: ![Deploy Contract](/request-string.png)
+Line 8407: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/monitoring-node-logs
+Line 8440: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/validators
+Line 8495: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/providers
+Line 8512: - **Provider Config:** Related environment variables, for example API keys or endpoint URLs.
+Line 8536: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/limitations
+Line 8538: GenLayer Studio limitations are Studio-specific caveats for building and testing Intelligent Contracts outside a full live-network replica. GenLayer Studio supports core contract execution, consensus testing, appeals, web access, and native value transfers, but live-network behavior should be validated where exact gas, chain-layer, EVM, or web-access behavior matters.
+Line 8550: ## Web Access
+Line 8552: Studio web access depends on its local browser/WebDriver service and the network access available to your Studio environment. Validate production-critical web reads against the target network before relying on exact rendering, timing, or availability behavior.
+Line 8557: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/reset-the-studio
+Line 8589: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/troubleshooting
+Line 8613: - **Webrequest:** 5000, 5001
+Line 8674: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/development-tips
+Line 8756: Source: https://docs.genlayer.com/developers/intelligent-contracts/tools/genlayer-studio/advanced-features/custom-plugins
+Line 8763: > you to create a Pull Request if you'd like your plugin to be included in the
+Line 8768: - [OpenAI](https://platform.openai.com/)
+Line 8769: - [Anthropic](https://www.anthropic.com/)
+Line 8770: - [Ollama](https://ollama.com/)
+Line 8771: - [Heuristai](https://heurist.ai/)
+Line 8779: To integrate a new LLM provider plugin, you need to implement the `Plugin` protocol defined in the [llms.py](https://github.com/genlayerlabs/genlayer-studio/blob/main/backend/node/genvm/llms.py) file. The protocol is structured as follows:
+Line 8804: self.base_url = plugin_config.get('base_url', 'https://api.customllm.com')
+Line 8816: async with aiohttp.ClientSession() as session:
+Line 8818: f"{self.base_url}/generate",
+Line 8830: return bool(self.api_key) and bool(self.base_url)
+Line 8863: To maintain consistency and enable proper configuration validation, you must update the [JSON schema](https://json-schema.org/) in the [`providers_schema.json`](https://github.com/genlayerlabs/genlayer-studio/blob/main/backend/node/create_nodes/providers_schema.json) file. This update should include your new provider and its specific configuration options.
+Line 8872: curl --request POST \
+Line 8873: --url http://localhost:4000/api \
+Line 8886: "base_url": "my.custom.url"
+Line 8897: Source: https://docs.genlayer.com/developers/intelligent-contracts/ideas
+Line 8899: GenLayer Intelligent Contract ideas are example applications that use web sources, APIs, and LLM calls to understand natural language and act on real-world information. Use these ideas as starting points for building Intelligent Contracts on GenLayer.
+Line 8903: | Prediction Markets                  | Use GenLayer to directly search the web for relevant information allowing users to place bets on future events and get outcomes automatically determined.                                           |
+Line 8904: | Parametric Insurance                | Create insurance that pays out based on real-world events, such as drought conditions or natural disasters, using data fetched from reliable sources.                                          |
+Line 8906: | Performance-based Contracting       | Set up contracts that pay out based on the completion of pre-agreed jobs, such as developing a website or creating a piece of content, with performance verified through automated checks.       |
+Line 8929: Source: https://docs.genlayer.com/developers/decentralized-applications/architecture-overview
+Line 8936: The user interface of the DApp is typically built with web technologies like HTML, CSS, and JavaScript. It communicates with the backend using the GenLayerJS SDK, enabling interaction with the GenLayer protocol and handling user inputs to trigger blockchain transactions.
+Line 8947: The execution environment (the GenVM) is the engine that executes Intelligent Contracts. It supports both deterministic and non-deterministic operations, enabling AI integration and web data access.
+Line 8950: Ghost contracts are proxy smart contracts on the consensus layer that facilitate interactions between accounts and Intelligent Contracts. They also manage external messages and asset bridging.
+Line 8973: Source: https://docs.genlayer.com/developers/decentralized-applications/dapp-development-workflow
+Line 8988: 1. **Set Up the Studio**: Developers initialize the Studio using `genlayer cli` command `genlayer init` which configures the environment and spawns a local validator network. GenLayer Studio is also available as a hosted instace at [studio.genlayer.com](https://studio.genlayer.com/).
+Line 8989: 2. **Write Your First Contract**: Intelligent Contracts in GenLayer are written in Python, utilizing its extensive libraries and GenVM capabilities like LLM calls and web integration. Refer to [Your First Contract](/developers/intelligent-contracts/your-first-contract) guide for more information.
+Line 9044: The GenVM allows Intelligent Contracts to interact with LLM models and access real-time web data. Developers should design contracts to maximize these capabilities for dynamic and intelligent DApps.
+Line 9057: Source: https://docs.genlayer.com/developers/decentralized-applications/genlayer-js
+Line 9132: [GenLayerJS SDK Repository](https://github.com/genlayerlabs/genlayer-js)
+Line 9141: Source: https://docs.genlayer.com/developers/decentralized-applications/querying-a-transaction
+Line 9255: throw new Error('Failed to fetch transaction after max retries');
+Line 9299: Source: https://docs.genlayer.com/developers/decentralized-applications/reading-data
+Line 9412: Source: https://docs.genlayer.com/developers/decentralized-applications/writing-data
+Line 9660: Source: https://docs.genlayer.com/developers/decentralized-applications/testing
+Line 9668: > Please note that you need the Studio running to run the tests by sending requests to it.
+Line 9675: from tools.request import create_new_account
+Line 9685: from tools.request import payload, post_request_localhost
+Line 9692: validators_response = post_request_localhost(
+Line 9702: from tools.request import deploy_intelligent_contract
+Line 9713: from tools.request import send_transaction, call_contract_method
+Line 9738: delete_response = post_request_localhost(payload("sim_deleteAllValidators")).json()
+Line 9744: Source: https://docs.genlayer.com/developers/decentralized-applications/project-boilerplate
+Line 9749: > This boilerplate is a work in progress and is not yet ready for production use. You can find the latest version at: [GenLayer Project Boilerplate](https://github.com/genlayerlabs/genlayer-project-boilerplate)
+Line 9796: git clone https://github.com/genlayerlabs/genlayer-project-boilerplate
+Line 9809: 1. Access the GenLayer Simulator UI (default: http://localhost:8080)
+Line 9900: Source: https://docs.genlayer.com/developers/staking-guide
+Line 10365: Source: https://docs.genlayer.com/validators/setup-guide
+Line 10411: 1. Install [Claude Code](https://claude.ai/code) (Anthropic's CLI tool)
+Line 10437: Browse all available skills at [skills.genlayer.com](https://skills.genlayer.com/) — the marketplace also includes the `genlayer-dev` skill for contract development.
+Line 10495: 7. **Identity setup** - Set your validator's public profile (moniker, website, etc.)
+Line 10555: Each validator needs access to a [ZKSync Full Node](https://docs.zksync.io/zksync-era/tooling/external-node) connected to the GenLayer chain. Validators use this node to read the chain state and submit transactions.
+Line 10568: curl -s "https://storage.googleapis.com/storage/v1/b/gh-af/o?prefix=genlayer-node/bin/amd64" | grep -o '"name": *"[^"]*"' | sed -n 's/.*\/\(v[^/]*\)\/.*/\1/p' | sort -ru | grep -v "rc" | head -n 5
+Line 10586: wget https://storage.googleapis.com/gh-af/genlayer-node/bin/amd64/${version}/genlayer-node-linux-amd64-${version}.tar.gz
+Line 10621: You can use the following example configuration. **Note:** For most users, you will only need to modify the `genlayerchainrpcurl`, `genlayerchainwebsocketurl`, and the `consensus` section for your target network (see [Network-Specific Consensus Configuration](#network-specific-consensus-configuration) below).
+Line 10626: genlayerchainrpcurl: "TODO: Set your GenLayer Chain ZKSync HTTP RPC URL here" # GenLayer Chain RPC URL
+Line 10627: genlayerchainwebsocketurl: "TODO: Set your GenLayer Chain ZKSync WebSocket RPC URL here" # GenLayer Chain WebSocket URL
+Line 10642: # Configuration for https://github.com/natefinch/lumberjack
+Line 10674: # host: 0.0.0.0 # bind address for the HTTP listener (default: all interfaces)
+Line 10677: # the HTTP transport (CORS) and the WS upgrade (gorilla CheckOrigin).
+Line 10678: # Exact-match URLs only — no wildcard syntax beyond "*". Omit or
+Line 10680: # override per-transport for WS via rpc.websocket.origins (rare).
+Line 10682: #   - "https://wallet.example.com"
+Line 10683: #   - "https://app.example.com"
+Line 10684: # websocket: inbound JSON-RPC WS endpoint for eth_subscribe /
+Line 10694: # websocket:
+Line 10698: #   path: "/ws"          # ws upgrade path — disambiguates HTTP RPC (POST /)
+Line 10699: #                        # from WS upgrade (GET /ws) at the URL level.
+Line 10710: #   max_message_bytes: 10485760   # 10 MB cap on a single inbound frame (parity with rpc.max_request_body_bytes)
+Line 10778: manager_url: http://127.0.0.1:3999
+Line 10781: sync_wait_timeout: "20s" # Max time to wait for GenVM to sync to a requested block before returning an error
+Line 10803: webdriver:
+Line 10847: | `rollup.genlayerchainrpcurl` | `GENLAYERNODE_ROLLUP_GENLAYERCHAINRPCURL` |
+Line 10848: | `rollup.genlayerchainwebsocketurl` | `GENLAYERNODE_ROLLUP_GENLAYERCHAINWEBSOCKETURL` |
+Line 10982: 2.  Run the WebDriver container
+Line 10985: docker compose up -d # Starts the WebDriver needed by the GenVM web module
+Line 10992: ./third_party/genvm/bin/genvm-modules web & ./third_party/genvm/bin/genvm-modules llm &
+Line 11025: > [here](https://www.networkworld.com/article/967925/how-the-linux-screen-tool-can-save-your-tasks-and-your-sanity-if-ssh-is-interrupted.html).
+Line 11035: webdriver-container:
+Line 11036: container_name: genlayer-node-webdriver
+Line 11037: image: yeagerai/genlayer-genvm-webdriver:0.0.11
+Line 11044: - "${WEBDRIVER_PORT:-4444}:4444"
+Line 11060: - ./genvm-module-web-docker.yaml:/app/third_party/genvm/config/genvm-module-web.yaml
+Line 11061: - /var/run/docker.sock:/var/run/docker.sock:ro # required for webdriver metrics collection
+Line 11071: - webdriver-container
+Line 11077: 2. Create `genvm-module-web-docker.yaml` for Docker networking:
+Line 11079: The extracted tarball includes `third_party/genvm/config/genvm-module-web.yaml` configured for `localhost`, which works when running
+Line 11080: the binary directly. For docker-compose, you need a version that points to the webdriver service name.
+Line 11082: Create `genvm-module-web-docker.yaml` in the same directory as your `docker-compose.yaml`:
+Line 11084: - Copy the contents of `third_party/genvm/config/genvm-module-web.yaml` into `genvm-module-web-docker.yaml`.
+Line 11085: - Modify the `webdriver_host` configuration to use the service name `webdriver-container` instead of `localhost`:
+Line 11088: webdriver_host: http://webdriver-container:4444
+Line 11091: This allows the node container to reach the webdriver container using Docker's internal networking.
+Line 11094: - **Binary execution**: uses `localhost:4444` (webdriver runs on same machine)
+Line 11095: - **Docker-compose**: uses `webdriver-container:4444` (container service name)
+Line 11106: # WebDriver Configuration (required for GenVM)
+Line 11108: WEBDRIVER_PORT=4444
+Line 11141: or simply use the provided `docker-compose.yaml`, `.env.example` and the `genvm-module-web-docker.yaml` from the extracted tarball.
+Line 11168: CENTRAL_MONITORING_URL=https://prometheus-prod-66-prod-us-east-3.grafana.net/api/prom/push
+Line 11169: CENTRAL_LOKI_URL=https://logs-prod-042.grafana.net/loki/api/v1/push
+Line 11189: 3. **Verify your node is pushing metrics** by checking the [GenLayer Foundation public dashboard](https://genlayerfoundation.grafana.net/public-dashboards/66a372d856ea44e78cf9ac21a344f792)
+Line 11196: Source: https://docs.genlayer.com/validators/monitoring
+Line 11214: http://localhost:9153/metrics
+Line 11223: - **WebDriver Metrics**: Metrics related to web access and external data fetching
+Line 11239: webdriver:
+Line 11250: curl http://localhost:9153/metrics
+Line 11253: curl -s http://localhost:9153/metrics | grep genlayer_node_
+Line 11271: You can forward your logs and metrics to external systems for centralized monitoring and alerting by using the service `alloy` provided in the `docker-compose.yaml` from the extracted tarball.
+Line 11286: - `CENTRAL_MONITORING_URL` — Prometheus remote write URL
+Line 11287: - `CENTRAL_LOKI_URL` — Loki push URL
+Line 11297: CENTRAL_MONITORING_URL=https://prometheus-prod-66-prod-us-east-3.grafana.net/api/prom/push
+Line 11298: CENTRAL_LOKI_URL=https://logs-prod-042.grafana.net/loki/api/v1/push
+Line 11338: - --server.http.listen-addr=0.0.0.0:12345
+Line 11353: - CENTRAL_LOKI_URL=${CENTRAL_LOKI_URL:-https://logs-prod-042.grafana.net/loki/api/v1/push}
+Line 11354: - CENTRAL_MONITORING_URL=${CENTRAL_MONITORING_URL:-https://prometheus-prod-66-prod-us-east-3.grafana.net/api/prom/push}
+Line 11458: url = sys.env("CENTRAL_LOKI_URL")
+Line 11460: // HTTP Basic Authentication
+Line 11526: url = sys.env("CENTRAL_MONITORING_URL")
+Line 11528: // HTTP Basic Authentication
+Line 11551: // Expose Alloy's own metrics on the HTTP server
+Line 11569: - Open Alloy UI: http://localhost:12345/targets — the "genlayer_node" scrape target should show status **UP**.
+Line 11589: The Grafana Alloy service includes a built-in web UI for troubleshooting and monitoring the telemetry pipeline. Access it at:
+Line 11592: http://localhost:12345
+Line 11608: curl http://localhost:9153/metrics
+Line 11615: - **No data pushed**: Ensure URLs in `.env` have no trailing slash.
+Line 11630: Source: https://docs.genlayer.com/validators/system-requirements
+Line 11673: - `docker` - for running the WebDriver container
+Line 11679: Source: https://docs.genlayer.com/validators/genvm-configuration
+Line 11681: GenVM Configuration defines the LLM providers and web module settings a validator's GenVM needs to process AI-powered contract logic and fetch live internet data. This page covers how to configure both.
+Line 11690: > **[Heurist](https://www.heurist.ai/)** — free [API credits](https://dev-api-form.heurist.ai) with referral code _"genlayer"_.
+Line 11692: > **[Comput3](https://genlayer.comput3.ai/)** — free [API credits](https://genlayer.comput3.ai/) for llama3, hermes3, and qwen3 models.
+Line 11694: > **[io.net](/partners/ionet)** — create an account at [id.io.net](https://id.io.net/login) and [request free credits](https://form.typeform.com/to/pDmCCViV).
+Line 11696: > **[Chutes](/partners/chutes)** — create an account at [chutes.ai](https://chutes.ai) and generate an API key from settings.
+Line 11698: > **[Morpheus](/partners/morpheus)** — obtain a [Morpheus API key](https://mor.org/) for DeepSeek, Llama, Qwen, and more via OpenAI-compatible API.
+Line 11708: curl -X POST "http://127.0.0.1:${PORT}/module/stop" \
+Line 11712: curl -X POST "http://127.0.0.1:${PORT}/module/start" \
+Line 11714: -d '{"module_type": "Web", "config": null}'
+Line 11726: | `genvm-module-web.yaml` | Web access, webdriver, URL restrictions | Rarely — only for advanced URL policy changes |
+Line 11739: host: https://api.example.com
+Line 11753: Intelligent Contract LLM requests have two axes:
+Line 11763: **Your validator must support all combinations across your model set.** Not every model needs to support everything — that's where routing comes in. You can use a cheap text model for simple prompts and a vision-capable model for image requests. But if a contract sends an image prompt and none of your enabled models support images, the request will fail.
+Line 11765: The `supports_json` and `supports_image` flags tell the Lua script which models are eligible for each request type. Set them accurately for each model.
+Line 11778: Add this to the `backends` section. No API key needed — Ollama runs locally. Follow [Ollama's install guide](https://ollama.com) to set up the server and pull a model.
+Line 11783: host: http://localhost:11434
+Line 11793: [OpenRouter](https://openrouter.ai) provides access to many models through a single API key:
+Line 11798: host: https://openrouter.ai/api
+Line 11834: Greyboxing is how you configure and optimize your validator's LLM execution. From the network's point of view, each validator is a **grey box** — an attacker can see that LLMs are being used, but cannot know which model will process a given request, how it's configured, or what filters are applied. This per-validator opacity is a security property: it makes prompt injection and manipulation attacks much harder because there's no single configuration to target.
+Line 11847: For image-capable requests, you need at least one vision model (e.g., GPT-5, Gemini Flash, Claude Sonnet).
+Line 11855: **Model selection** — Choose which LLM handles each request. You can route text prompts to a cheap fast model and image prompts to a vision-capable one. This can be random, an ordered fallback chain, or a custom router.
+Line 11997: | `lib.rs.request(ctx, {method, url, headers, body, json, sign})` | HTTP request. `json: true` returns parsed response. |
+Line 12003: | `lib.rs.split_url(url)` | Parse URL → `{schema, host, port}` |
+Line 12004: | `lib.rs.url_encode(text)` | URL-encode text |
+Line 12015: | `llm.rs.exec_prompt_in_provider(ctx, request)` | Execute prompt on a specific provider/model |
+Line 12021: | `llm.overloaded_statuses` | HTTP codes indicating overload: `{408, 429, 503, 504, 529}` |
+Line 12023: ### Web functions (`web.rs`)
+Line 12027: | `web.config` | Web module configuration |
+Line 12028: | `web.allowed_tld` | Set of allowed top-level domains |
+Line 12029: | `web.check_url(url)` | Validate URL against schema, port, and TLD restrictions |
+Line 12031: ## Advanced: Web Module
+Line 12033: The web module (`genvm-module-web.yaml`) enables contracts to fetch web pages, make HTTP requests, and capture screenshots. You generally don't need to modify this.
+Line 12035: The Lua script (`genvm-web-default.lua`) implements two functions:
+Line 12037: - `Request(ctx, payload)` — make HTTP requests (GET, POST, etc.)
+Line 12041: - `always_allow_hosts: ["my-api.internal"]` — bypass URL checks for specific hosts
+Line 12056: **"NO_PROVIDER_FOR_PROMPT":** No enabled backend matches the request's capabilities. Ensure at least one has `supports_json: true` (and `supports_image: true` for image prompts).
+Line 12063: Source: https://docs.genlayer.com/validators/upgrade
+Line 12112: - The GenLayer Chain ZKSync RPC URLs (`genlayerchainrpcurl` and `genlayerchainwebsocketurl`) have changed. Update both the HTTP RPC and WebSocket URLs in your `config.yaml` to the new endpoints.
+Line 12128: Source: https://docs.genlayer.com/validators/changelog
+Line 12156: - Inbound WebSocket JSON-RPC endpoint
+Line 12221: - Pool HTTP transport for chain RPC
+Line 12291: - Add metrics to rollup RPC transport and WebSocket
+Line 12337: - Use CtxLogger in HTTP handler constructors
+Line 12361: - Fetch on-chain data in Accepted/Undetermined handlers
+Line 12428: - Add Docker socket mount for webdriver metrics collection in docker-compose configurations
+Line 12438: - Improve logs for http servers
+Line 12504: - Add actionable fix suggestions to WebDriver error messages in doctor command
+Line 12525: - Update WebDriver check for Puppeteer implementation
+Line 12549: - Update webdriver image to v0.0.9
+Line 12550: - Update RPC and WebSocket endpoints in config.yaml.example
+Line 12576: - Add actionable fix suggestions to WebDriver error messages in doctor command
+Line 12594: - Remove response body size limit for WebDriver
+Line 12611: - Enable CORS support for HTTP methods in the API
+Line 12652: - Enhance WebDriver health check validation
+Line 12787: Source: https://docs.genlayer.com/api-references
+Line 12794: - [GenLayer SDK](https://sdk.genlayer.com/)
+Line 12799: Source: https://docs.genlayer.com/api-references/genlayer-cli
+Line 12974: --rpc <rpcUrl>             RPC URL for the network
+Line 12978: --rpc <rpcUrl>             RPC URL for the network
+Line 12982: --rpc <rpcUrl>             RPC URL for the network
+Line 12986: --rpc <rpcUrl>             RPC URL for the network
+Line 13046: --rpc <rpcUrl>          RPC URL override
+Line 13064: genlayer transactions trace <txId> [--round N] [--rpc URL]
+Line 13186: --rpc <rpcUrl>                RPC URL override
+Line 13314: For detailed information on how to use GenLayer CLI, please refer to our [documentation](https://docs.genlayer.com/).
+Line 13318: We welcome contributions to GenLayerJS SDK! Whether it's new features, improved infrastructure, or better documentation, your input is valuable. Please read our [CONTRIBUTING](https://github.com/yeagerai/genlayer-js/blob/main/CONTRIBUTING.md) guide for guidelines on how to submit your contributions.
+Line 13327: Source: https://docs.genlayer.com/api-references/genlayer-js
+Line 13459: ### Fetching emitted messages and triggered transactions
+Line 13628: For detailed information on how to use GenLayerJS SDK, please refer to our [documentation](https://docs.genlayer.com/).
+Line 13632: We welcome contributions to GenLayerJS SDK! Whether it's new features, improved infrastructure, or better documentation, your input is valuable. Please read our [CONTRIBUTING](https://github.com/genlayerlabs/genlayer-js/blob/main/CONTRIBUTING.md) guide for guidelines on how to submit your contributions.
+Line 13641: Source: https://docs.genlayer.com/api-references/genlayer-js/contracts
+Line 13852: Source: https://docs.genlayer.com/api-references/genlayer-js/transactions
+Line 13854: Methods for fetching transactions, waiting for receipts, estimating gas, and debugging execution traces.
+Line 13874: Fetches transaction data including status, execution result, and consensus details.
+Line 13898: Fetches the full execution trace including return data, stdout, stderr, and GenVM logs.
+Line 13951: Source: https://docs.genlayer.com/api-references/genlayer-js/staking
+Line 14037: Sets validator identity information (name, website, social links).
+Line 14044: | website | `string` | no |  |
+Line 14213: Source: https://docs.genlayer.com/api-references/genlayer-py
+Line 14217: GenLayerPY SDK is a python library designed for developers building decentralized applications (Dapps) on the GenLayer protocol. This SDK provides a comprehensive set of tools to interact with the GenLayer network, including client creation, transaction handling, event subscriptions, and more, all while leveraging the power of web3.py as the underlying blockchain client.
+Line 14346: ### Fetching emitted messages and triggered transactions
+Line 14389: For detailed information on how to use GenLayerPY SDK, please refer to our [documentation](https://docs.genlayer.com/api-references/genlayer-py).
+Line 14393: We welcome contributions to GenLayerPY SDK! Whether it's new features, improved infrastructure, or better documentation, your input is valuable. Please read our [CONTRIBUTING](https://github.com/genlayerlabs/genlayer-py/blob/main/CONTRIBUTING.md) guide for guidelines on how to submit your contributions.
+Line 14402: Source: https://docs.genlayer.com/api-references/genlayer-py/api
+Line 14617: Fetches transaction data including status, execution result, and consensus details.
+Line 14649: Fetches the full execution trace including return data, stdout, stderr, and GenVM logs.
+Line 14744: Source: https://docs.genlayer.com/api-references/genlayer-test
+Line 14746: A pytest-based testing framework for [GenLayer](https://docs.genlayer.com/) intelligent contracts. Built on top of [genlayer-py](https://docs.genlayer.com/api-references/genlayer-py).
+Line 14762: | **Mocking** | Foundry-style cheatcodes (`mock_web`, `mock_llm`) | Mock validators with transaction context |
+Line 14822: # Mock web/LLM (regex pattern matching)
+Line 14823: direct_vm.mock_web(r"api\.example\.com", {"status": 200, "body": "{}"})
+Line 14888: url: "http://127.0.0.1:4000/api"
+Line 14917: gltest --rpc-url http://custom:4000/api
+Line 15032: ### Mock Web Responses
+Line 15034: Simulate HTTP responses for contracts that call `gl.nondet.web.get()`, etc.:
+Line 15037: from gltest.types import MockedWebResponse
+Line 15040: mock_web_response: MockedWebResponse = {
+Line 15041: "nondet_web_request": {
+Line 15042: "https://api.example.com/price": {
+Line 15052: mock_web_response=mock_web_response
+Line 15056: You can combine both `mock_llm_response` and `mock_web_response` in a single `batch_create_mock_validators` call. URL matching is exact (including query parameters).
+Line 15099: **[Full Studio Mode Documentation](docs/studio-runner.md)** — configuration reference, all CLI flags, mock LLM/web details, custom validators, statistical analysis, and complete examples.
+Line 15157: - [Documentation](https://docs.genlayer.com/api-references/genlayer-test)
+Line 15158: - [Discord](https://discord.gg/qjCU4AWnKE)
+Line 15159: - [GitHub Issues](https://github.com/genlayerlabs/genlayer-testing-suite/issues)
+Line 15160: - [Twitter](https://x.com/GenLayer)
+Line 15165: Source: https://docs.genlayer.com/api-references/genlayer-test/integration
+Line 15424: validator_factory.create_mock_validator(mock_llm_response: Optional = None, mock_web_response: Optional = None)
+Line 15432: | `mock_web_response` | `Optional` | No | `None` |
+Line 15441: validator_factory.batch_create_mock_validators(count: int, mock_llm_response: Optional = None, mock_web_response: Optional = None)
+Line 15450: | `mock_web_response` | `Optional` | No | `None` |
+Line 15457: Validator(stake: int, provider: str, model: str, config: Dict[str, Any], plugin: str, plugin_config: Dict[str, Any], mock_enabled: bool, mock_llm_response: Optional[gltest.types.MockedLLMResponse], mock_web_response: Optional[gltest.types.MockedWebResponse])
+Line 15490: Source: https://docs.genlayer.com/api-references/genlayer-test/direct
+Line 15579: vm.mock_web("api.example.com", {"status": 200, "body": "{}"})
+Line 15659: ### `vm.mock_web`
+Line 15661: Mock web requests matching URL pattern.
+Line 15664: vm.mock_web(url_pattern: str, response: MockedWebResponseData)
+Line 15671: | `url_pattern` | `str` | Yes |  |
+Line 15672: | `response` | `MockedWebResponseData` | Yes |  |
+Line 15776: internally, which hits the current web/LLM mocks. Swap mocks
+Line 15778: the validator seeing different external data.
+Line 15815: Source: https://docs.genlayer.com/api-references/genlayer-test/glsim
+Line 15817: A lightweight single-process GenLayer network that runs contracts via direct mode. Supports real LLM and web calls without Docker or WASM.
+Line 15848: | `--no-browser` | false | Use httpx instead of Playwright for web |
+Line 15870: - `sim_install_mocks` — Install web/LLM mocks
+Line 15883: Source: https://docs.genlayer.com/api-references/genlayer-node
+Line 15885: The GenLayer Node provides a [JSON-RPC API](https://www.jsonrpc.org/specification) for interacting with it. This API allows you to execute contract calls, retrieve transaction information, and perform various blockchain operations.
+Line 15897: - `request` (object, required): The contract call request parameters
+Line 15990: "web_module": { "calls": 0, "time": 0 }
+Line 15993: "web": null
+Line 16133: - `request` (object, required): The contract schema request
+Line 16209: - `request` (object, required): The contract state request parameters
+Line 16216: **Example Request - Latest Accepted State:**
+Line 16231: **Example Request - Specific Block and Status:**
+Line 16266: **cURL Example:**
+Line 16270: curl -X POST http://localhost:9151 \
+Line 16282: curl -X POST http://localhost:9151 \
+Line 16304: - `request` (object, required): The contract code request parameters
+Line 16311: **Example Request - Latest Accepted State:**
+Line 16326: **Example Request - Specific Block and Status:**
+Line 16361: **cURL Example:**
+Line 16365: curl -X POST http://localhost:9151 \
+Line 16377: curl -X POST http://localhost:9151 \
+Line 16399: - `request` (object, required):
+Line 16447: **Example Request:**
+Line 16546: - `request` (object, required):
+Line 16578: **Example Request:**
+Line 16630: **Example Request:**
+Line 16673: - When the node is catching up, `gen_call` requests without an explicit `blockNumber` will serve data at the `syncedBlock` rather than waiting for full sync
+Line 16718: - `request` (object, required): The trie debug request
+Line 16757: - `request` (object, required):
+Line 16823: The GenLayer Node also supports Ethereum-compatible methods that are proxied to the underlying infrastructure. These methods follow the standard [Ethereum JSON-RPC specification](https://ethereum.org/en/developers/docs/apis/json-rpc/) and are prefixed with `eth_`.
+Line 16835: [zkSync-compatible](https://docs.zksync.io/zksync-protocol/api/zks-rpc) methods are also supported and proxied to the underlying infrastructure. These methods are prefixed with `zksync_`.
+Line 16839: ### cURL
+Line 16843: curl -X POST http://localhost:9151 \
+Line 16853: curl -X POST http://localhost:9151 \
+Line 16869: curl -X POST http://localhost:9151 \
+Line 16881: curl -X POST http://localhost:9151 \
+Line 16894: curl -X POST http://localhost:9151 \
+Line 16920: **Example Request:**
+Line 16923: curl -X GET http://localhost:9153/balance
+Line 16949: - Returns HTTP 503 if the node is not in validator mode
+Line 16950: - Returns HTTP 500 if there's an error retrieving the balance
+Line 16980: **cURL Example with Headers:**
+Line 16983: curl -X GET http://localhost:9153/balance \
+Line 16998: **Example Request:**
+Line 17001: curl -X GET http://localhost:9153/health
+Line 17031: **HTTP Status Codes:**
+Line 17064: **cURL Example with Headers:**
+Line 17067: curl -X GET http://localhost:9153/health \
+Line 17082: **Example Request:**
+Line 17085: curl -X GET http://localhost:9153/metrics
+Line 17095: genlayer_node_cpu_usage_percent{component="genvm-web"} 12.8
+Line 17096: genlayer_node_cpu_usage_percent{component="webdriver"} 5.3
+Line 17112: - **GenVM** - The GenVM modules (LLM and Web)
+Line 17113: - **WebDriver** - The WebDriver container
+Line 17124: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 17130: genlayer_node_cpu_usage_percent{component="genvm-web"} 12.8
+Line 17131: genlayer_node_cpu_usage_percent{component="webdriver"} 5.3
+Line 17143: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 17158: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 17164: Current memory usage in bytes (WebDriver only).
+Line 17169: - `component`: `webdriver`
+Line 17173: Memory limit in bytes (WebDriver only).
+Line 17178: - `component`: `webdriver`
+Line 17187: - `component`: One of `genvm-llm`, `genvm-web`, `node`, `webdriver`
+Line 17197: - `component`: One of `genvm-llm`, `genvm-web`
+Line 17209: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 17215: genlayer_node_network_rx_bytes_total{component="webdriver",node="0x84b6cbd007511352d3fea26834c5c39a440903c4"} 84
+Line 17225: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 17411: - `promhttp_metric_handler_requests_total` - Total scrape requests by status code
+Line 17412: - `promhttp_metric_handler_requests_in_flight` - Current scrapes being served
+Line 17428: webdriver:
+Line 17429: enabled: true      # Enable/disable WebDriver metrics
+Line 17449: **WebDriver Metrics Missing**
+Line 17451: Ensure the WebDriver container is running:
+Line 17453: docker ps | grep genlayer-node-webdriver
+Line 17458: task docker:webdriver:docker-compose:up:detach
+Line 17472: Produces a consistent snapshot of the node's state at the current block. Two modes selected by the request body: stream the snapshot back as a gzipped tar response (operator path), or write it to a destination directory on the node's filesystem (zero-downtime upgrade-controller path).
+Line 17498: **Example Request — Stream Mode (operator):**
+Line 17503: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 17514: curl -X POST http://localhost:9153/snapshot \
+Line 17521: The response body is a stream — `curl` can write it to a file (as above) or pipe it through any tool that reads stdin, without staging on local disk.
+Line 17526: HTTP/1.1 200 OK
+Line 17533: **Example Request — Write-to-Path Mode (upgrade controller):**
+Line 17536: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 17545: HTTP/1.1 204 No Content
+Line 17548: **HTTP Status Codes:**
+Line 17552: - `400 Bad Request`: `destDir` is not absolute, or already exists.
+Line 17559: - In stream mode, a dropped connection leaves no on-disk artifact on the node; retry the request from scratch.
+Line 17561: - **Docker deploys**: in write-to-path mode, `destDir` is resolved inside the node container's filesystem, not on the host. To make the resulting directory reachable from the host (or from another container), use a volume mount that maps `destDir` identically on both sides, or stick with stream mode. Stream mode is unaffected — the response body is sent over HTTP regardless of where the node runs.
+Line 17568: **cURL Example with Bearer header:**
+Line 17571: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 17581: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_call
+Line 17591: - `request` (object, required): The contract call request parameters
+Line 17684: "web_module": { "calls": 0, "time": 0 }
+Line 17687: "web": null
+Line 17822: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_getContractSchema
+Line 17832: - `request` (object, required): The contract schema request
+Line 17910: - `request` (object, required): The contract state request parameters
+Line 17917: **Example Request - Latest Accepted State:**
+Line 17932: **Example Request - Specific Block and Status:**
+Line 17967: **cURL Example:**
+Line 17971: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_getContractState
+Line 17972: curl -X POST http://localhost:9151 \
+Line 17984: curl -X POST http://localhost:9151 \
+Line 18008: - `request` (object, required): The contract code request parameters
+Line 18015: **Example Request - Latest Accepted State:**
+Line 18030: **Example Request - Specific Block and Status:**
+Line 18065: **cURL Example:**
+Line 18069: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_getContractCode
+Line 18070: curl -X POST http://localhost:9151 \
+Line 18082: curl -X POST http://localhost:9151 \
+Line 18099: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_getTransactionReceipt
+Line 18109: - `request` (object, required):
+Line 18157: **Example Request:**
+Line 18251: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_getTransactionStatus
+Line 18261: - `request` (object, required):
+Line 18293: **Example Request:**
+Line 18330: Source: https://docs.genlayer.com/api-references/genlayer-node/gen/gen_syncing
+Line 18350: **Example Request:**
+Line 18393: - When the node is catching up, `gen_call` requests without an explicit `blockNumber` will serve data at the `syncedBlock` rather than waiting for full sync
+Line 18398: Source: https://docs.genlayer.com/api-references/genlayer-node/debug/gen_dbg_ping
+Line 18434: Source: https://docs.genlayer.com/api-references/genlayer-node/debug/gen_dbg_trie
+Line 18444: - `request` (object, required): The trie debug request
+Line 18478: Source: https://docs.genlayer.com/api-references/genlayer-node/debug/gen_dbg_traceTransaction
+Line 18488: - `request` (object, required):
+Line 18555: Source: https://docs.genlayer.com/api-references/genlayer-node/ops/balance
+Line 18567: **Example Request:**
+Line 18570: curl -X GET http://localhost:9153/balance
+Line 18596: - Returns HTTP 503 if the node is not in validator mode
+Line 18597: - Returns HTTP 500 if there's an error retrieving the balance
+Line 18627: **cURL Example with Headers:**
+Line 18630: curl -X GET http://localhost:9153/balance \
+Line 18638: Source: https://docs.genlayer.com/api-references/genlayer-node/ops/health
+Line 18650: **Example Request:**
+Line 18653: curl -X GET http://localhost:9153/health
+Line 18683: **HTTP Status Codes:**
+Line 18716: **cURL Example with Headers:**
+Line 18719: curl -X GET http://localhost:9153/health \
+Line 18736: **Example Request:**
+Line 18739: curl -X GET http://localhost:9153/metrics
+Line 18746: Source: https://docs.genlayer.com/api-references/genlayer-node/ops/metrics
+Line 18750: genlayer_node_cpu_usage_percent{component="genvm-web"} 12.8
+Line 18751: genlayer_node_cpu_usage_percent{component="webdriver"} 5.3
+Line 18767: - **GenVM** - The GenVM modules (LLM and Web)
+Line 18768: - **WebDriver** - The WebDriver container
+Line 18779: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 18785: genlayer_node_cpu_usage_percent{component="genvm-web"} 12.8
+Line 18786: genlayer_node_cpu_usage_percent{component="webdriver"} 5.3
+Line 18798: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 18813: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 18819: Current memory usage in bytes (WebDriver only).
+Line 18824: - `component`: `webdriver`
+Line 18828: Memory limit in bytes (WebDriver only).
+Line 18833: - `component`: `webdriver`
+Line 18842: - `component`: One of `genvm-llm`, `genvm-web`, `node`, `webdriver`
+Line 18852: - `component`: One of `genvm-llm`, `genvm-web`
+Line 18864: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 18870: genlayer_node_network_rx_bytes_total{component="webdriver",node="0x84b6cbd007511352d3fea26834c5c39a440903c4"} 84
+Line 18880: - `component`: One of `node`, `genvm-llm`, `genvm-web`, `webdriver`
+Line 19066: - `promhttp_metric_handler_requests_total` - Total scrape requests by status code
+Line 19067: - `promhttp_metric_handler_requests_in_flight` - Current scrapes being served
+Line 19083: webdriver:
+Line 19084: enabled: true      # Enable/disable WebDriver metrics
+Line 19104: **WebDriver Metrics Missing**
+Line 19106: Ensure the WebDriver container is running:
+Line 19108: docker ps | grep genlayer-node-webdriver
+Line 19113: task docker:webdriver:docker-compose:up:detach
+Line 19128: Source: https://docs.genlayer.com/api-references/genlayer-node/ops/snapshot
+Line 19132: Produces a consistent snapshot of the node's state at the current block. Two modes selected by the request body: stream the snapshot back as a gzipped tar response (operator path), or write it to a destination directory on the node's filesystem (zero-downtime upgrade-controller path).
+Line 19158: **Example Request — Stream Mode (operator):**
+Line 19163: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 19174: curl -X POST http://localhost:9153/snapshot \
+Line 19181: The response body is a stream — `curl` can write it to a file (as above) or pipe it through any tool that reads stdin, without staging on local disk.
+Line 19186: HTTP/1.1 200 OK
+Line 19193: **Example Request — Write-to-Path Mode (upgrade controller):**
+Line 19196: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 19205: HTTP/1.1 204 No Content
+Line 19208: **HTTP Status Codes:**
+Line 19212: - `400 Bad Request`: `destDir` is not absolute, or already exists.
+Line 19219: - In stream mode, a dropped connection leaves no on-disk artifact on the node; retry the request from scratch.
+Line 19221: - **Docker deploys**: in write-to-path mode, `destDir` is resolved inside the node container's filesystem, not on the host. To make the resulting directory reachable from the host (or from another container), use a volume mount that maps `destDir` identically on both sides, or stick with stream mode. Stream mode is unaffected — the response body is sent over HTTP regardless of where the node runs.
+Line 19228: **cURL Example with Bearer header:**
+Line 19231: curl -X POST http://127.0.0.1:9153/snapshot \
+Line 19241: Source: https://docs.genlayer.com/api-references/genlayer-linter
+Line 19303: **returns raw nondeterministic output directly**. LLM outputs and raw web content vary
+Line 19312: - **Namespace-qualified** (v0.1.0 and v0.1.3+ APIs): `gl.exec_prompt`, `gl.get_webpage`,
+Line 19313: `gl.nondet.exec_prompt`, `gl.nondet.web.render`, and their `genlayer.*` equivalents
+Line 19314: - **Bare names** (direct SDK import convention): `exec_prompt`, `get_webpage` — matched
+Line 19324: # Bad — namespace-qualified, raw web content varies (v0.1.0 API)
+Line 19325: gl.eq_principle.strict_eq(lambda: gl.get_webpage("https://example.com"))
+Line 19329: gl.eq_principle.strict_eq(lambda: gl.nondet.web.render("https://example.com"))
+Line 19335: def fetch():
+Line 19338: gl.eq_principle.strict_eq(fetch)
+Line 19341: def fetch():
+Line 19345: gl.eq_principle.strict_eq(fetch)
+Line 19352: gl.eq_principle.strict_eq(lambda: "Paris" in gl.get_webpage("https://example.com"))
+Line 19366: names `exec_prompt` and `get_webpage` are flagged when called without a namespace prefix
+Line 19397: This linter is used by the [GenLayer VS Code Extension](https://github.com/genlayerlabs/vscode-extension) for real-time contract validation.
+Line 19423: git clone https://github.com/genlayerlabs/genvm-linter.git
+Line 19436: Source: https://docs.genlayer.com/partners/genlayerlabs
+Line 19438: [GenLayer Labs](https://www.genlayerlabs.com/) is a pioneering AI research lab and one of the core developers of GenLayer. GenLayer Labs focuses on using AI to enhance the performance, security, and scalability of blockchain networks, with work dedicated to revolutionizing human-AI interaction. By embedding AI into the blockchain's core, GenLayer Labs enables decentralized applications to make smart decisions autonomously, opening new possibilities for automation and efficiency in various industries.
+Line 19445: Source: https://docs.genlayer.com/partners/heurist
+Line 19447: [Heurist](https://www.heurist.ai/) is a Layer 2 network for AI model hosting and inference, built on the ZK Stack. Heurist offers serverless access to open-source AI models through a decentralized network, making AI deployment easy and efficient for developers. This approach promotes transparency and reduces bias, which is especially useful for projects like GenLayer that require detailed AI analysis.
+Line 19449: In collaboration with GenLayer, Heurist provides APIs for open-source large language models (LLMs) to enable developers building Intelligent Contracts to use AI at low or no cost. Developers building on GenLayer can obtain free [Heurist API credits](https://dev-api-form.heurist.ai) by using the referral code: _"genlayer"_.
+Line 19456: Source: https://docs.genlayer.com/partners/ionet
+Line 19458: io.intelligence is an AI infrastructure and API platform from [io.net](https://io.net) that gives the IO community and AI developers API access to advanced AI models and AI agents. The platform lets users access and integrate pre-trained open-source models and custom AI agents into applications through API calls, powered by [io.net](https://io.net)'s decentralized distributed compute network.
+Line 19460: Through its partnership with GenLayer, [io.net](https://io.net) provides access to over 25 top open-source models, including the latest versions of Deepseek, Qwen, Llama, and Mistral, through one unified API endpoint. Developers on GenLayer can receive free daily compute tokens to access io.intelligence for Enterprise by completing a short [form](https://form.typeform.com/to/pDmCCViV).
+Line 19462: API Reference: https://docs.io.net/reference/get-started-with-io-intelligence-api
+Line 19467: Source: https://docs.genlayer.com/partners/comput3
+Line 19469: [Comput3](https://genlayer.comput3.ai/) is a decentralized compute network that provides serverless access to open-source AI models through distributed infrastructure. The platform gives developers access to powerful AI capabilities without requiring local hardware.
+Line 19471: In partnership with GenLayer, Comput3 provides access to inferencing APIs with support for llama3, hermes3, and qwen3 models. GenLayer Validators can use the Comput3.ai inferencing API to power their Intelligent Contracts with high-quality AI responses, and can obtain free [Comput3 API credits](https://genlayer.comput3.ai/) to get started with their validator setup.
+Line 19478: Source: https://docs.genlayer.com/partners/chutes
+Line 19480: Chutes is a serverless inference platform for open-source AI models that GenLayer validators can access through the Chutes API. Chutes runs on decentralized GPU infrastructure powered by Bittensor, so validators can call AI models through a simple HTTP API without running their own GPU infrastructure.
+Line 19482: This guide explains how GenLayer validators can use Chutes to access AI models, authenticate requests, and run model inference from a validator environment. GenLayer Validators can request a discount on Chutes models by [filling out this form](https://docs.google.com/forms/d/e/1FAIpQLSd6I_Q0aiCalDQLX9FvzQ3hfFaKR4j1jaDEoa-jfpXhLclmog/viewform).
+Line 19503: - [Chutes Website](https://chutes.ai)
+Line 19504: - [Chutes Documentation](https://chutes.ai/docs)
+Line 19505: - [Chutes API Reference](https://api.chutes.ai/docs)
+Line 19506: - [Available Models (API)](https://llm.chutes.ai/v1/models)
+Line 19507: - [Model Browser (Web UI)](https://chutes.ai/app?type=llm)
+Line 19513: First create an account: [https://chutes.ai](https://chutes.ai)
+Line 19527: API keys allow applications to authenticate requests to the Chutes API.
+Line 19536: Your API key will be used in authenticated API requests.
+Line 19540: ## 3. Authenticate Requests
+Line 19547: curl https://llm.chutes.ai/v1/models \
+Line 19561: **Endpoint:** `https://llm.chutes.ai/v1/chat/completions`
+Line 19568: - API endpoint: [https://llm.chutes.ai/v1/models](https://llm.chutes.ai/v1/models)
+Line 19569: - Browse them visually: [https://chutes.ai/app?type=llm](https://chutes.ai/app?type=llm)
+Line 19571: ### Example request from a validator environment:
+Line 19574: curl https://llm.chutes.ai/v1/chat/completions \
+Line 19610: Because the Chutes API is stateless and accessed via HTTPS, it can be integrated into validator environments without additional infrastructure.
+Line 19618: You can retrieve the current list using: [https://llm.chutes.ai/v1/models](https://llm.chutes.ai/v1/models)
+Line 19623: curl https://llm.chutes.ai/v1/models
+Line 19628: Models can also be browsed in the Chutes web interface: [https://chutes.ai/app?type=llm](https://chutes.ai/app?type=llm)
+Line 19649: - [Explore the full API reference](https://api.chutes.ai/docs)
+Line 19650: - [View the latest available models](https://llm.chutes.ai/v1/models)
+Line 19651: - [Browse models in the Chutes app](https://chutes.ai/app?type=llm)
+Line 19652: - [Learn more about Chutes](https://chutes.ai/docs)
+Line 19657: Source: https://docs.genlayer.com/partners/libertai
+Line 19659: [LibertAI](https://libertai.io) is a decentralized AI platform that provides confidential AI services through [Aleph Cloud](https://aleph.cloud) GPUs and TEEs, designed to be more secure and resilient than traditional centralized alternatives while protecting user privacy. LibertAI also offers tools for AI Agents to become self-sustainable & more!
+Line 19661: In partnership with GenLayer, [LibertAI](https://libertai.io) provides access to top open-source models with complete data confidentiality through one unified API endpoint. Developers on GenLayer can receive free API credits visible in the [LibertAI console](https://console.libertai.io). Complete a short [form](https://tally.so/r/n9AvdK) to get started.
+Line 19663: API Reference: https://docs.libertai.io/apis
+Line 19668: Source: https://docs.genlayer.com/partners/morpheus
+Line 19672: [Morpheus](https://mor.org/) is a decentralized AI inference network where open-source model providers compete on a peer-to-peer marketplace. The network routes requests across independent compute providers instead of relying on a single centralized API, offering models like DeepSeek, Llama, Qwen, and others, with the available model list updating dynamically as providers join and leave the network.
+Line 19674: In partnership with GenLayer, Morpheus provides decentralized LLM inference for Intelligent Contract validators through an OpenAI-compatible API. GenLayer Studio fetches available models from the Morpheus marketplace in real time, so validators always see the latest options. Developers can obtain a [Morpheus API key](https://mor.org/) to get started.
+Line 19681: Source: https://docs.genlayer.com/FAQ
+Line 19685: GenLayer is the **adjudication layer for the agentic economy**. It uses decentralized AI-validator consensus to resolve contracts that require judgment, not just code. It's built as an L2 on zkSync Elastic Chain, anchoring to Ethereum's security. Contracts on GenLayer — called **Intelligent Contracts** — can interpret language, process images, fetch live web data, and reach consensus on contested or subjective outcomes. See [What is GenLayer](/understand-genlayer-protocol/what-is-genlayer).
+Line 19689: Traditional smart contracts can only execute deterministic logic and rely on external oracles for off-chain data. GenLayer integrates AI at the protocol level — contracts natively access LLMs, the web, and image processing. No oracles, no intermediaries. Where Bitcoin reached consensus on the *order* of transactions and Ethereum on the *execution* of code, GenLayer reaches consensus on the **meaning** of transactions. See [What is GenLayer](/understand-genlayer-protocol/what-is-genlayer#how-it-compares).
+Line 19693: No. GenLayer is built to provide a **first-instance, internet-native adjudication layer** for disputes that arrive too quickly, too often, and too globally for traditional courts to handle in time — particularly the disputes the agentic economy is starting to produce at machine speed. It is designed to complement, not replace, existing legal frameworks.
+Line 19697: The agentic-commerce stack — Coinbase's [x402](https://www.x402.org/) for payments, Ethereum's [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) for trustless agent identity, the Linux Foundation's [A2A](https://a2a-protocol.org) for agent interoperability, plus Stripe/OpenAI's ACP, Visa's Trusted Agent Protocol, Google's AP2, and Mastercard's Agent Pay — engineers the happy path. None of these standards ships dispute resolution. GenLayer is the layer they reach for when a commitment becomes contested.
+Line 19709: Since LLMs and web data produce varying outputs, GenLayer provides multiple strategies: strict equality (for deterministic operations), LLM-based comparison (validators compare outputs against criteria), and custom validation functions (developers define their own leader/validator logic). See [Non-determinism](/developers/intelligent-contracts/features/non-determinism).
+Line 19713: Yes. Pass images to LLMs via `gl.nondet.exec_prompt(images=[...])`. Contracts can also capture web page screenshots with `gl.nondet.web.render(url, mode='screenshot')` and analyze them. See [Image Processing](/developers/intelligent-contracts/features/image-processing).
+Line 19729: Every Intelligent Contract has a corresponding ghost contract on the GenLayer Chain (EVM layer) at the same address. Ghost contracts hold the contract's GEN balance, relay transactions to consensus, and execute external messages. See [Ghost Contracts](/developers/intelligent-contracts/features/messages#ghost-contracts).
+Line 19733: Anything requiring judgment that deterministic code alone can't resolve: performance and milestone adjudication (bounties, grants, retro funding), adjudication inside the agentic-commerce stack (agent SLAs, escrow on ambiguous completion, reputation disputes), prediction markets, insurance claims, content verification, compliance automation, AI-governed DAOs, and more. See [Use Cases](/understand-genlayer-protocol/typical-use-cases) and [projects building on GenLayer](https://portal.genlayer.foundation/#/).
+Line 19737: 1. Try [GenLayer Studio](https://studio.genlayer.com) in the browser — no setup needed
+Line 19752: - Join the community on [Discord](https://discord.gg/8Jm4v89VAu) or [Telegram](https://t.me/genlayer)
+Line 19753: - Contribute to the [GitHub repositories](https://github.com/genlayerlabs)
+Line 19754: - [We're hiring](https://x.com/GenLayer/jobs)
