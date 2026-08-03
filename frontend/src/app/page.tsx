@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { useModal } from 'connectkit';
 import { useRouter } from 'next/navigation';
+import { ArrowRight, Shield, Activity, Wallet } from 'lucide-react';
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -20,43 +21,71 @@ export default function Home() {
   };
 
   return (
-    <div className="container main-content">
-      <main style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', marginTop: '4rem' }}>
-        <h2 style={{ fontSize: '4rem', lineHeight: 1.1, marginBottom: '1.5rem', fontWeight: 600, letterSpacing: '-0.04em' }}>
-          Hackathon prizes,<br /> distributed fairly.
-        </h2>
-        <p style={{ fontSize: '1.25rem', color: 'var(--muted-foreground)', marginBottom: '3rem', maxWidth: '600px', margin: '0 auto 3rem auto' }}>
-          Quota is an AI-powered prize allocation platform built on GenLayer. We eliminate arguments over prize distribution with transparent, evidence-based evaluations.
-        </p>
-
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '6rem' }}>
-          <button onClick={handleMainAction} style={{
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            padding: '0.75rem 1.5rem',
-            borderRadius: 'var(--radius)',
-            fontWeight: 500,
-            fontSize: '1rem',
-            border: 'none',
-            display: 'inline-block'
-          }}>
-            {isConnected ? 'Go to Dashboard' : 'Get Started'}
-          </button>
+    <div className="min-h-screen bg-background text-on-surface animate-slide-up pb-24">
+      <main className="max-w-[900px] mx-auto mt-24 text-center px-6">
+        
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-outline-variant bg-surface-container-low text-xs font-medium text-on-surface mb-8">
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          Powered by GenLayer AI Consensus
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', textAlign: 'left', borderTop: '1px solid var(--border)', paddingTop: '4rem' }}>
-          <div>
-            <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', fontWeight: 500 }}>Evidence-based</h3>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Members submit commits, design assets, and research. GenLayer AI evaluates all contributions impartially.</p>
+        <h1 className="text-[clamp(3rem,5vw,4.5rem)] font-headline font-black leading-[1.1] tracking-tight mb-6 text-primary">
+          Distribute hackathon prizes <br />
+          <span className="text-on-surface-variant">without the arguments.</span>
+        </h1>
+        
+        <p className="text-lg text-on-surface-variant max-w-[600px] mx-auto mb-12 leading-relaxed">
+          Quota is an AI-driven allocation engine. We replace subjective debates with transparent, evidence-based evaluations.
+        </p>
+
+        <div className="flex items-center justify-center gap-4 mb-24">
+          <button 
+            onClick={handleMainAction} 
+            className="flex items-center gap-2 bg-primary text-on-primary px-8 py-3.5 rounded text-base font-bold hover:opacity-90 transition-all shadow-xl active:scale-[0.98]"
+          >
+            {isConnected ? 'Go to Dashboard' : 'Connect Wallet'}
+            <ArrowRight size={18} />
+          </button>
+          <Link 
+            href="/how-it-works" 
+            className="flex items-center gap-2 bg-surface-container-high border border-outline-variant text-on-surface px-8 py-3.5 rounded text-base font-bold hover:bg-surface-variant transition-all active:scale-[0.98]"
+          >
+            Read the Docs
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+          
+          <div className="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+            <div className="w-12 h-12 rounded-xl bg-surface-container-highest border border-outline-variant flex items-center justify-center mb-6">
+              <Shield size={24} className="text-primary" />
+            </div>
+            <h3 className="text-xl font-bold font-headline mb-3 text-primary">Evidence-based</h3>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              Members submit commits, designs, and docs to a shared vault. GenLayer AI evaluates all contributions impartially based on impact.
+            </p>
           </div>
-          <div>
-            <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', fontWeight: 500 }}>Transparent</h3>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>The AI proposes a detailed reasoning and allocation. Members review, appeal, and finalize consensus on-chain.</p>
+          
+          <div className="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+            <div className="w-12 h-12 rounded-xl bg-surface-container-highest border border-outline-variant flex items-center justify-center mb-6">
+              <Activity size={24} className="text-primary" />
+            </div>
+            <h3 className="text-xl font-bold font-headline mb-3 text-primary">Transparent</h3>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              The AI proposes detailed reasoning and allocation arrays. Members review, appeal, and finalize consensus natively on-chain.
+            </p>
           </div>
-          <div>
-            <h3 style={{ fontSize: '1.125rem', marginBottom: '0.5rem', fontWeight: 500 }}>Automatic Payouts</h3>
-            <p style={{ color: 'var(--muted-foreground)', fontSize: '0.9rem' }}>Prizes securely locked in a multi-chain Vault are distributed automatically once consensus is reached.</p>
+          
+          <div className="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+            <div className="w-12 h-12 rounded-xl bg-surface-container-highest border border-outline-variant flex items-center justify-center mb-6">
+              <Wallet size={24} className="text-primary" />
+            </div>
+            <h3 className="text-xl font-bold font-headline mb-3 text-primary">Automatic Payouts</h3>
+            <p className="text-on-surface-variant text-sm leading-relaxed">
+              Prizes are securely locked in a multi-chain Vault and distributed automatically to wallets once consensus is definitively reached.
+            </p>
           </div>
+          
         </div>
       </main>
     </div>

@@ -26,7 +26,7 @@ export function getGenLayerReadClient() {
 
 // Write client that proxies the transaction through the user's connected MetaMask
 export function getGenLayerWriteClient(walletAddress: string) {
-  if (typeof window === 'undefined' || !window.ethereum) {
+  if (typeof window === 'undefined' || !(window as any).ethereum) {
     throw new Error("MetaMask (window.ethereum) is required to sign this transaction.");
   }
 
@@ -34,18 +34,19 @@ export function getGenLayerWriteClient(walletAddress: string) {
     chain: getChainConfig() as any,
     endpoint: GENLAYER_RPC_URL || undefined,
     account: walletAddress as `0x${string}`,
-    provider: window.ethereum,
+    provider: (window as any).ethereum,
   });
 }
 
-export async function createProjectOnGenLayer(contractAddress: string, walletAddress: string, projectId: string) {
+export async function createProjectOnGenLayer(contractAddress: string, walletAddress: string, projectId: string, vaultAddress: string) {
   console.log(`Registering project ${projectId} on GenLayer...`);
   try {
     const client = getGenLayerWriteClient(walletAddress);
     const txHash = await client.writeContract({
-      address: contractAddress,
+      address: contractAddress as `0x${string}`,
       functionName: 'create_project',
-      args: [projectId],
+      args: [projectId, vaultAddress],
+      value: BigInt(0),
     });
     
     console.log(`GenLayer Create TX Hash: ${txHash}`);
@@ -62,9 +63,10 @@ export async function closeSubmissionsOnGenLayer(contractAddress: string, wallet
   try {
     const client = getGenLayerWriteClient(walletAddress);
     const txHash = await client.writeContract({
-      address: contractAddress,
+      address: contractAddress as `0x${string}`,
       functionName: 'close_submissions',
       args: [projectId],
+      value: BigInt(0),
     });
     
     console.log(`GenLayer Close TX Hash: ${txHash}`);
@@ -81,9 +83,10 @@ export async function startAIEvaluationOnGenLayer(contractAddress: string, walle
   try {
     const client = getGenLayerWriteClient(walletAddress);
     const txHash = await client.writeContract({
-      address: contractAddress,
+      address: contractAddress as `0x${string}`,
       functionName: 'evaluate_contributions',
       args: [projectId, evidenceUrl, expectedHash],
+      value: BigInt(0),
     });
     
     console.log(`GenLayer AI Eval TX Hash: ${txHash}`);
@@ -99,9 +102,10 @@ export async function appealOnGenLayer(contractAddress: string, accountAddress: 
     const client = getGenLayerWriteClient(accountAddress);
     
     const txHash = await client.writeContract({
-      address: contractAddress,
+      address: contractAddress as `0x${string}`,
       functionName: 'start_appeal',
       args: [projectId],
+      value: BigInt(0),
     });
     
     console.log(`GenLayer Appeal TX Hash: ${txHash}`);

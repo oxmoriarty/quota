@@ -14,7 +14,7 @@ module.exports = {
     },
   },
   paths: {
-    sources: "./src",
+    sources: "./contracts",
   },
   networks: {
     base_sepolia: {

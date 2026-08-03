@@ -2,216 +2,245 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useWriteContract, usePublicClient, useSwitchChain } from 'wagmi';
+import { useAccount, useSwitchChain, useWriteContract, usePublicClient } from 'wagmi';
+import { parseEventLogs } from 'viem';
 import { supabase } from '@/lib/supabase';
-import { QUOTA_VAULT_FACTORY_ABI } from '@/lib/abi';
+import { Shield, Sparkles, Building2, ArrowRight, LayoutDashboard, Search, Bell, User } from 'lucide-react';
 import { createProjectOnGenLayer } from '@/lib/genlayer';
+import { vaultFactoryAbi } from '@/lib/abis';
+import { Sidebar } from '@/components/Sidebar';
+import Link from 'next/link';
 
-const FACTORY_ADDRESS = process.env.NEXT_PUBLIC_FACTORY_ADDRESS || '0x0000000000000000000000000000000000000000';
-const GENLAYER_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS || 'GLMockContract123';
+const GENLAYER_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS || "GLMockContract123";
+const FACTORY_ADDRESS = process.env.NEXT_PUBLIC_FACTORY_ADDRESS as `0x${string}`;
 
-export default function CreateProjectPage() {
+export default function CreateProject() {
   const router = useRouter();
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
   const [formData, setFormData] = useState({
     name: '',
     hackathon: '',
-    description: '',
-    repo_url: '',
-    prize_chain: 'Base',
-    prize_token: 'USDC',
+    prizeToken: 'USDC',
+    prizeChain: 'Base',
+    description: ''
   });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address) return;
+    if (!address) return alert("Please connect wallet");
+    if (!publicClient) return alert("Wagmi client not ready");
+    if (!FACTORY_ADDRESS) return alert("Missing Factory Address in env");
+    
     setLoading(true);
-    setError('');
-
     try {
-      // 1. Get user id from Supabase
-      const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('wallet_address', address.toLowerCase())
-        .single();
-        
-      if (userError || !user) throw new Error("User not found in database. Please register.");
+      const { data: user } = await supabase.from('users').select('*').eq('wallet_address', address.toLowerCase()).single();
+      if (!user) throw new Error("User not found");
 
-      // 2. Trigger EVM Vault Deployment via Factory
-      let vaultAddress = null;
+      // 1. Deploy EVM Vault
+      console.log("Deploying EVM Vault...");
+      const TOKENS: Record<string, string> = {
+        'ETH': '0x0000000000000000000000000000000000000000',
+        'USDC': '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // Base Sepolia Mock
+        'USDT': '0x7169D38820dfd117C3FA1f22a697dBA58d90BA06'  // Base Sepolia Mock
+      };
+      const tokenAddress = TOKENS[formData.prizeToken] || TOKENS['USDC'];
+
+      const evmTxHash = await writeContractAsync({
+        address: FACTORY_ADDRESS,
+        abi: vaultFactoryAbi,
+        functionName: 'createVault',
+        args: [tokenAddress as `0x${string}`],
+      });
+      
+      console.log(`Waiting for EVM tx: ${evmTxHash}`);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: evmTxHash });
+      const logs = parseEventLogs({ abi: vaultFactoryAbi, logs: receipt.logs, eventName: 'VaultCreated' });
+      
+      if (!logs || logs.length === 0) throw new Error("Failed to parse VaultCreated event");
+      const vaultAddress = logs[0].args.vault;
+      console.log(`EVM Vault Created at: ${vaultAddress}`);
+
+      // 2. Save to Supabase
+      const { data, error } = await supabase.from('projects').insert({
+        name: formData.name,
+        hackathon: formData.hackathon,
+        prize_token: formData.prizeToken,
+        prize_chain: formData.prizeChain,
+        vault_address: vaultAddress,
+        description: formData.description,
+        creator_id: user.id,
+        status: 'Submissions Open'
+      }).select().single();
+
+      if (error) throw error;
+      
+      await supabase.from('team_members').insert({
+        project_id: data.id,
+        user_id: user.id,
+        role: 'Creator / PM'
+      });
+
+      // 3. Register on GenLayer
       try {
-        console.log("Triggering EVM Vault Deployment...");
-        // This will fail gas estimation if FACTORY_ADDRESS is 0x0... 
-        // In a real app with a deployed factory, this pops up the wallet.
-        if (FACTORY_ADDRESS !== '0x0000000000000000000000000000000000000000') {
-          if (chainId !== 84532) {
-            console.log("Switching to Base Sepolia...");
-            await switchChainAsync({ chainId: 84532 });
-          }
-
-          // Simulate the transaction first to get the returned Vault Address
-          const { request, result } = await publicClient!.simulateContract({
-            address: FACTORY_ADDRESS as `0x${string}`,
-            abi: QUOTA_VAULT_FACTORY_ABI,
-            functionName: 'createVault',
-            account: address as `0x${string}`,
-          });
-          
-          vaultAddress = result; // The returned address from the contract
-          console.log("Vault will be deployed to:", vaultAddress);
-          
-          const hash = await writeContractAsync(request);
-          console.log("Vault Deployment Hash:", hash);
-        } else {
-          console.log("Skipping EVM deployment (No Factory Address set).");
-          vaultAddress = `0xMockVault_${Date.now()}`;
-        }
-      } catch (err: any) {
-        console.warn("Vault deployment failed or rejected, falling back to mock:", err.message);
-        vaultAddress = `0xMockVault_${Date.now()}`;
-      }
-
-      // 3. Save to Supabase
-      const { data: project, error: insertError } = await supabase
-        .from('projects')
-        .insert({
-          name: formData.name,
-          hackathon: formData.hackathon,
-          description: formData.description,
-          repo_url: formData.repo_url,
-          prize_chain: formData.prize_chain,
-          prize_token: formData.prize_token,
-          vault_address: vaultAddress,
-          creator_id: user.id,
-          status: 'Submissions Open'
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      // Add creator as a team member automatically
-      await supabase
-        .from('team_members')
-        .insert({
-          project_id: project.id,
-          user_id: user.id,
-          role: 'Creator'
-        });
-
-      // 4. Register Project on GenLayer Registry
-      try {
-        console.log("Registering project on GenLayer...");
         if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
-           if (chainId !== 4221) {
+           if (chainId !== 4221 && switchChainAsync) {
              console.log("Switching to GenLayer Bradbury...");
              await switchChainAsync({ chainId: 4221 });
            }
-           await createProjectOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id);
-        } else {
-           console.log("Skipping GenLayer Registration (No Registry Address set).");
+           await createProjectOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, data.id, vaultAddress);
         }
       } catch (err: any) {
         console.warn("GenLayer registration failed:", err.message);
       }
-
-      router.push(`/project/${project.id}`);
+      
+      router.push(`/project/${data.id}`);
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Failed to create project");
+      alert("Error: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container main-content" style={{ maxWidth: '800px' }}>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Create Hackathon Project</h1>
-      
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', backgroundColor: 'var(--card)', padding: '2rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Project Name *</label>
-            <input required type="text" name="name" value={formData.name} onChange={handleChange} style={inputStyle} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Hackathon Name *</label>
-            <input required type="text" name="hackathon" value={formData.hackathon} onChange={handleChange} style={inputStyle} />
-          </div>
-        </div>
-
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Short Description *</label>
-          <textarea required name="description" value={formData.description} onChange={handleChange} style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }} />
-        </div>
-
-        <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Repository URL *</label>
-          <input required type="url" name="repo_url" value={formData.repo_url} onChange={handleChange} style={inputStyle} placeholder="https://github.com/..." />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Prize Chain *</label>
-            <select name="prize_chain" value={formData.prize_chain} onChange={handleChange} style={inputStyle}>
-              <option value="Base">Base</option>
-              <option value="Monad">Monad</option>
-              <option value="Ethereum">Ethereum</option>
-              <option value="Optimism">Optimism</option>
-              <option value="Arbitrum">Arbitrum</option>
-            </select>
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Expected Prize Token *</label>
-            <input required type="text" name="prize_token" value={formData.prize_token} onChange={handleChange} style={inputStyle} placeholder="USDC, ETH, etc." />
-          </div>
-        </div>
+    <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
+      <Sidebar />
+      <main className="flex-1 ml-64 flex flex-col min-h-screen relative">
         
-        {error && <div style={{ color: 'var(--destructive)', fontSize: '0.9rem' }}>{error}</div>}
+        {/* TopAppBar */}
+        <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
+          <div className="flex items-center space-x-4">
+            <h1 className="font-headline text-2xl font-semibold text-primary tracking-tight">New Workspace</h1>
+          </div>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3">
+              <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
+                <Bell size={20} />
+              </button>
+              <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
+                <User size={20} />
+              </button>
+            </div>
+          </div>
+        </header>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
-          <button type="button" onClick={() => router.back()} style={{
-            backgroundColor: 'transparent',
-            color: 'var(--foreground)',
-            padding: '0.75rem 1.5rem',
-            borderRadius: 'var(--radius)',
-            fontWeight: 500,
-            border: '1px solid var(--border)',
-          }}>Cancel</button>
-          <button type="submit" disabled={loading} style={{
-            backgroundColor: 'var(--primary)',
-            color: 'var(--primary-foreground)',
-            padding: '0.75rem 1.5rem',
-            borderRadius: 'var(--radius)',
-            fontWeight: 500,
-            border: 'none',
-            opacity: loading ? 0.7 : 1
-          }}>
-            {loading ? 'Creating...' : 'Create Project'}
-          </button>
-        </div>
-      </form>
+        {/* Content */}
+        <section className="p-8 flex-1 flex flex-col items-center justify-center overflow-y-auto custom-scrollbar animate-slide-up">
+          <div className="w-full max-w-2xl">
+            
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-surface-container-highest border border-outline-variant text-primary mb-4 shadow-inner">
+                <LayoutDashboard size={24} />
+              </div>
+              <h1 className="text-3xl font-black font-headline text-primary tracking-tight mb-2">Create a Workspace</h1>
+              <p className="text-on-surface-variant text-sm max-w-md mx-auto">
+                Deploy an AI-evaluated prize pool and evidence vault for your hackathon project.
+              </p>
+            </div>
+
+            <div className="bg-surface-container-low border border-outline-variant rounded-xl p-8 shadow-2xl">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Project Name</label>
+                  <div className="relative">
+                    <Building2 size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                    <input 
+                      required 
+                      type="text" 
+                      placeholder="e.g. Quota Protocol" 
+                      className="bg-surface-container-highest border border-outline-variant rounded px-10 py-2.5 text-sm w-full focus:outline-none focus:border-primary text-on-surface transition-colors"
+                      value={formData.name} 
+                      onChange={e => setFormData({...formData, name: e.target.value})} 
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Hackathon / Event</label>
+                  <div className="relative">
+                    <Sparkles size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+                    <input 
+                      required 
+                      type="text" 
+                      placeholder="e.g. ETHGlobal London" 
+                      className="bg-surface-container-highest border border-outline-variant rounded px-10 py-2.5 text-sm w-full focus:outline-none focus:border-primary text-on-surface transition-colors"
+                      value={formData.hackathon} 
+                      onChange={e => setFormData({...formData, hackathon: e.target.value})} 
+                    />
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-outline-variant my-2"></div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Project Details</label>
+                  <textarea 
+                    required 
+                    placeholder="Describe your project, goals, and the scope of work for the hackathon..." 
+                    className="bg-surface-container-highest border border-outline-variant rounded px-4 py-3 text-sm w-full focus:outline-none focus:border-primary text-on-surface transition-colors min-h-[100px]"
+                    value={formData.description} 
+                    onChange={e => setFormData({...formData, description: e.target.value})} 
+                  />
+                </div>
+
+                <div className="h-px w-full bg-outline-variant my-2"></div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Prize Token</label>
+                    <select 
+                      className="bg-surface-container-highest border border-outline-variant rounded px-3 py-2.5 text-sm w-full focus:outline-none focus:border-primary text-on-surface transition-colors"
+                      value={formData.prizeToken} 
+                      onChange={e => setFormData({...formData, prizeToken: e.target.value})}
+                    >
+                      <option value="USDC">USDC</option>
+                      <option value="USDT">USDT</option>
+                      <option value="ETH">ETH</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Network Chain</label>
+                    <select 
+                      className="bg-surface-container-highest border border-outline-variant rounded px-3 py-2.5 text-sm w-full focus:outline-none focus:border-primary text-on-surface transition-colors"
+                      value={formData.prizeChain} 
+                      onChange={e => setFormData({...formData, prizeChain: e.target.value})}
+                    >
+                      <option value="Base">Base</option>
+                      <option value="Optimism">Optimism</option>
+                      <option value="Arbitrum">Arbitrum</option>
+                      <option value="Ethereum">Ethereum</option>
+                    </select>
+                  </div>
+                </div>
+
+
+
+                <div className="mt-4">
+                  <button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="w-full bg-primary text-on-primary py-3 rounded text-sm font-bold hover:bg-opacity-90 active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <span className="w-4 h-4 rounded-full border-2 border-on-primary border-t-transparent animate-spin"></span>
+                        Initializing Dual-Chain Workspace...
+                      </span>
+                    ) : (
+                      <>Deploy Workspace <ArrowRight size={16} /></>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+            
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
-
-const inputStyle = {
-  width: '100%',
-  padding: '0.75rem',
-  borderRadius: 'var(--radius)',
-  border: '1px solid var(--border)',
-  backgroundColor: 'var(--input)',
-  color: 'var(--foreground)',
-  fontSize: '1rem'
-};

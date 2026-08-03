@@ -51,6 +51,19 @@ contract Vault is Initializable {
         require(!isDistributed, "Already distributed");
         require(recipients.length == percentages.length, "Length mismatch");
         
+        // Restrict caller to either the Project Creator or one of the winning recipients
+        bool isAuthorized = (msg.sender == projectCreator);
+        if (!isAuthorized) {
+            for (uint i = 0; i < recipients.length; i++) {
+                if (msg.sender == recipients[i]) {
+                    isAuthorized = true;
+                    break;
+                }
+            }
+        }
+        require(isAuthorized, "Only the project creator or a winner can distribute prizes");
+
+        
         // Ensure percentages add up exactly to 100% (represented as 10000 for basis points)
         uint256 totalPercentage = 0;
         for (uint i = 0; i < percentages.length; i++) {
