@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ConnectKitButton } from 'connectkit';
 import { usePathname } from 'next/navigation';
 import { Shield } from 'lucide-react';
+import Image from 'next/image';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -14,9 +15,8 @@ export function Navbar() {
     <header className="sticky top-0 w-full z-50 flex items-center justify-center backdrop-blur-md bg-background/80 border-b border-outline-variant">
       <div className="flex justify-between items-center w-full max-w-[1200px] px-6 py-4">
         <div className="flex items-center gap-10">
-          <Link href="/" className="text-base font-semibold tracking-tight flex items-center gap-2 text-primary">
-            <Shield size={20} className="text-primary" />
-            Quota
+          <Link href="/" className="flex items-center group">
+            <Image src="/quotalogo.svg" alt="Quota Logo" width={120} height={40} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-auto h-10" priority />
           </Link>
 
           <nav className="flex gap-6">

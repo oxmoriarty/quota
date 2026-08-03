@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -46,7 +47,7 @@ export default function DashboardPage() {
     );
   }
 
-  const activeProjects = projects.filter(p => p.status !== 'Distribution Complete' && p.status !== 'No Prize Awarded');
+  const activeProjects = projects.filter(p => p.status !== 'Distribution Complete' && p.status !== 'No Prize Awarded' && p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
@@ -55,13 +56,7 @@ export default function DashboardPage() {
         {/* TopAppBar */}
         <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
           <div className="flex items-center space-x-4">
-            <h1 className="font-headline text-2xl font-semibold text-primary tracking-tight">Dashboard</h1>
-            <div className="h-4 w-[1px] bg-outline-variant"></div>
-            <div className="flex items-center space-x-1 text-on-surface-variant text-sm">
-              <span>Projects</span>
-              <span className="material-symbols-outlined text-xs">chevron_right</span>
-              <span className="text-primary font-medium">Active</span>
-            </div>
+            <h1 className="font-headline text-2xl font-semibold text-on-surface tracking-tight">Overview</h1>
           </div>
           <div className="flex items-center space-x-6">
             <div className="relative group">
@@ -70,6 +65,8 @@ export default function DashboardPage() {
                 className="bg-surface-container-low border border-outline-variant rounded px-10 py-1.5 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-on-surface-variant/50 text-on-surface" 
                 placeholder="Search projects..." 
                 type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1">
                 <kbd className="text-[10px] bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant font-sans opacity-60">⌘</kbd>
@@ -77,10 +74,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
+              <button onClick={() => alert("No new notifications")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <Bell size={20} />
               </button>
-              <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
+              <button onClick={() => alert("Profile coming soon!")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <User size={20} />
               </button>
               <Link href="/create" className="bg-primary text-on-primary px-4 py-1.5 rounded text-sm font-semibold hover:bg-opacity-90 transition-all shadow-sm flex items-center gap-2">
@@ -130,11 +127,11 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-on-surface uppercase tracking-widest">Active Hackathon Projects</h2>
             <div className="flex items-center space-x-2">
-              <button className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
+              <button onClick={() => alert("Filter functionality coming soon")} className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
                 <Filter size={14} />
                 <span>Filter</span>
               </button>
-              <button className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
+              <button onClick={() => alert("Sort functionality coming soon")} className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
                 <ArrowUpDown size={14} />
                 <span>Sort</span>
               </button>
@@ -221,15 +218,24 @@ export default function DashboardPage() {
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
               <div className="relative z-10">
                 <div className="flex items-center space-x-2 text-primary mb-4">
-                  <Timer size={16} />
-                  <h3 className="text-xs font-bold uppercase tracking-widest">Next Deadline</h3>
+                  <Activity size={16} />
+                  <h3 className="text-xs font-bold uppercase tracking-widest">Recent Project</h3>
                 </div>
-                <p className="text-2xl font-headline font-bold text-primary mb-1">-- : -- : --</p>
-                <p className="text-sm text-on-surface-variant font-medium">No active milestones</p>
+                {activeProjects.length > 0 ? (
+                  <>
+                    <p className="text-xl font-headline font-bold text-on-surface mb-1 truncate">{activeProjects[0].name}</p>
+                    <p className="text-sm text-on-surface-variant font-medium">{activeProjects[0].status}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xl font-headline font-bold text-on-surface-variant mb-1">None</p>
+                    <p className="text-sm text-on-surface-variant font-medium">Create a workspace to start</p>
+                  </>
+                )}
               </div>
-              <button className="relative z-10 mt-6 w-full py-2 bg-surface-container-low border border-outline-variant text-primary text-xs font-bold rounded hover:bg-surface-bright transition-all">
-                VIEW MILESTONES
-              </button>
+              <Link href={activeProjects.length > 0 ? `/project/${activeProjects[0].id}` : '/create'} className="relative z-10 mt-6 w-full py-2 flex items-center justify-center bg-surface-container-low border border-outline-variant text-primary text-xs font-bold rounded hover:bg-primary/10 transition-all">
+                {activeProjects.length > 0 ? 'OPEN WORKSPACE' : 'NEW WORKSPACE'}
+              </Link>
               <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700"></div>
             </div>
           </div>

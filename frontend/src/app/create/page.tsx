@@ -137,7 +137,7 @@ export default function CreateProject() {
               </div>
               <h1 className="text-3xl font-black font-headline text-primary tracking-tight mb-2">Create a Workspace</h1>
               <p className="text-on-surface-variant text-sm max-w-md mx-auto">
-                Deploy an AI-evaluated prize pool and evidence vault for your hackathon project.
+                Deploy a vault for your project.
               </p>
             </div>
 
@@ -210,9 +210,9 @@ export default function CreateProject() {
                       onChange={e => setFormData({...formData, prizeChain: e.target.value})}
                     >
                       <option value="Base">Base</option>
-                      <option value="Optimism">Optimism</option>
-                      <option value="Arbitrum">Arbitrum</option>
-                      <option value="Ethereum">Ethereum</option>
+                      <option value="Optimism" disabled>Optimism (Coming Soon)</option>
+                      <option value="Arbitrum" disabled>Arbitrum (Coming Soon)</option>
+                      <option value="Ethereum" disabled>Ethereum (Coming Soon)</option>
                     </select>
                   </div>
                 </div>

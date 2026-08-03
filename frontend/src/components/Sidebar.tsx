@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Rocket, Clock, Settings, FileText, HelpCircle, Plus } from 'lucide-react';
 import { useAccount } from 'wagmi';
+import Image from 'next/image';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -14,13 +15,9 @@ export function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 space-y-6 z-20">
       {/* Brand / Header */}
-      <Link href="/" className="flex items-center space-x-3 px-2">
-        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-          <Rocket size={18} className="text-on-primary" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-lg font-headline font-bold text-on-surface tracking-tight">Quota OS</span>
-          <span className="text-[10px] text-on-surface-variant uppercase tracking-widest font-medium">Hackathon Engine</span>
+      <Link href="/" className="flex items-center px-2 group">
+        <div className="flex items-center justify-center transition-transform group-hover:scale-105">
+          <Image src="/quotalogo.svg" alt="Quota Logo" width={140} height={48} className="drop-shadow-lg object-contain w-auto h-12" priority />
         </div>
       </Link>
 

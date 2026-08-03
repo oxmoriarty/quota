@@ -35,18 +35,29 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider theme="retro" customTheme={{
-          "--ck-font-family": "var(--font-sans)",
-          "--ck-border-radius": "8px",
-          "--ck-overlay-background": "rgba(0, 0, 0, 0.7)",
-          "--ck-overlay-backdrop-filter": "blur(4px)",
-          "--ck-body-background": "#18181b",
-          "--ck-body-color": "#fafafa",
-          "--ck-primary-button-background": "#fafafa",
-          "--ck-primary-button-color": "#18181b",
-          "--ck-secondary-button-background": "#27272a",
-          "--ck-secondary-button-color": "#fafafa",
-        }}>
+        <ConnectKitProvider 
+          theme="midnight" 
+          customTheme={{
+            "--ck-font-family": "var(--font-sans)",
+            "--ck-border-radius": "16px",
+            "--ck-overlay-background": "rgba(2, 6, 23, 0.85)", // deep slate overlay
+            "--ck-overlay-backdrop-filter": "blur(8px)",
+            "--ck-body-background": "#0f172a", // surface-container-low
+            "--ck-body-background-secondary": "#1e293b",
+            "--ck-body-color": "#f8fafc",
+            "--ck-body-color-muted": "#94a3b8",
+            "--ck-primary-button-background": "#1e293b",
+            "--ck-primary-button-hover-background": "#334155",
+            "--ck-primary-button-color": "#f8fafc",
+            "--ck-primary-button-border-radius": "12px",
+            "--ck-secondary-button-background": "#020617",
+            "--ck-secondary-button-hover-background": "#1e293b",
+            "--ck-secondary-button-color": "#f8fafc",
+            "--ck-secondary-button-border-radius": "12px",
+            "--ck-accent-color": "#6366f1", // primary indigo
+            "--ck-accent-text-color": "#ffffff",
+          }}
+        >
           {children}
         </ConnectKitProvider>
       </QueryClientProvider>
