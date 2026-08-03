@@ -12,8 +12,11 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
   const [isRegistered, setIsRegistered] = useState<boolean | null>(null);
 
   useEffect(() => {
+    // Public routes that don't need auth protection
+    const isPublicRoute = pathname === '/' || pathname === '/how-it-works' || pathname === '/projects';
+
     // If not connected and not connecting, and trying to access protected routes
-    if (!isConnected && !isConnecting && pathname !== '/' && pathname !== '/register') {
+    if (!isConnected && !isConnecting && !isPublicRoute && pathname !== '/register') {
       router.push('/');
       return;
     }
@@ -43,16 +46,30 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
     }
   }, [isConnected, isConnecting, address, pathname, router]);
 
-  // Handle loading states
-  if (isConnecting) return <div style={{ padding: '4rem', textAlign: 'center' }}>Connecting wallet...</div>;
+  const isPublicRoute = pathname === '/' || pathname === '/how-it-works' || pathname === '/projects';
+
+  // Handle loading states for protected routes ONLY
+  if (isConnecting && !isPublicRoute) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] space-y-4">
+         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+         <p className="text-sm text-on-surface-variant font-medium animate-pulse tracking-widest uppercase">Connecting Wallet</p>
+      </div>
+    );
+  }
   
-  // If connected but we don't know registration status yet
-  if (isConnected && isRegistered === null && pathname !== '/') {
-    return <div style={{ padding: '4rem', textAlign: 'center' }}>Verifying account...</div>;
+  // If connected but we don't know registration status yet, and trying to access a protected route
+  if (isConnected && isRegistered === null && !isPublicRoute && pathname !== '/register') {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] space-y-4">
+         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+         <p className="text-sm text-on-surface-variant font-medium animate-pulse tracking-widest uppercase">Verifying Account</p>
+      </div>
+    );
   }
 
-  // If connected and not registered, and not on the register page, don't render children
-  if (isConnected && isRegistered === false && pathname !== '/register') {
+  // If connected and not registered, and not on the register page or public page, don't render children
+  if (isConnected && isRegistered === false && !isPublicRoute && pathname !== '/register') {
     return null;
   }
 
