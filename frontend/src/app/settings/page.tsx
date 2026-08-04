@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Sidebar } from '@/components/Sidebar';
-import { Bell, User, Moon, Sun, Wallet, Github, Twitter, Mail, Palette, Globe, Shield } from 'lucide-react';
+import { Bell, User, Moon, Sun, Wallet, GitBranch, AtSign, Mail, Palette, Globe, Shield } from 'lucide-react';
 
 export default function SettingsPage() {
   const { address } = useAccount();
@@ -101,14 +101,14 @@ export default function SettingsPage() {
                   <div className="space-y-3">
                     <button className="w-full flex items-center justify-between p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:bg-surface-bright transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <Github size={20} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                        <GitBranch size={20} className="text-on-surface-variant group-hover:text-primary transition-colors" />
                         <span className="text-sm font-medium">Connect GitHub</span>
                       </div>
                       <span className="text-[10px] uppercase font-bold text-primary tracking-widest">Connect</span>
                     </button>
                     <button className="w-full flex items-center justify-between p-4 rounded-lg bg-surface-container-low border border-outline-variant hover:bg-surface-bright transition-colors group">
                       <div className="flex items-center space-x-3">
-                        <Twitter size={20} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                        <AtSign size={20} className="text-on-surface-variant group-hover:text-primary transition-colors" />
                         <span className="text-sm font-medium">Connect Twitter / X</span>
                       </div>
                       <span className="text-[10px] uppercase font-bold text-primary tracking-widest">Connect</span>
