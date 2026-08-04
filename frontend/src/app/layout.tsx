@@ -10,6 +10,9 @@ import { AuthWrapper } from '@/components/AuthWrapper';
 export const metadata: Metadata = {
   title: 'Quota',
   description: 'AI-powered hackathon prize allocation platform.',
+  icons: {
+    icon: '/quotafavicon.svg',
+  },
 };
 
 export default function RootLayout({
