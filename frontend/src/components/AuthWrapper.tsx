@@ -36,8 +36,8 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
           }
         } else {
           setIsRegistered(true);
-          // If on landing or register and already registered, redirect to dashboard
-          if (pathname === '/' || pathname === '/register') {
+          // If on register and already registered, redirect to dashboard
+          if (pathname === '/register') {
             router.push('/dashboard');
           }
         }
@@ -48,27 +48,8 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
 
   const isPublicRoute = pathname === '/' || pathname === '/how-it-works' || pathname === '/projects';
 
-  // Handle loading states for protected routes ONLY
-  if (isConnecting && !isPublicRoute) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] space-y-4">
-         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-         <p className="text-sm text-on-surface-variant font-medium animate-pulse tracking-widest uppercase">Connecting Wallet</p>
-      </div>
-    );
-  }
-  
-  // If connected but we don't know registration status yet, and trying to access a protected route
-  if (isConnected && isRegistered === null && !isPublicRoute && pathname !== '/register') {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh] space-y-4">
-         <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-         <p className="text-sm text-on-surface-variant font-medium animate-pulse tracking-widest uppercase">Verifying Account</p>
-      </div>
-    );
-  }
-
   // If connected and not registered, and not on the register page or public page, don't render children
+  // (This prevents protected content from flashing while the router.push to /register is happening)
   if (isConnected && isRegistered === false && !isPublicRoute && pathname !== '/register') {
     return null;
   }

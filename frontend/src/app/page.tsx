@@ -24,12 +24,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-on-surface animate-slide-up pb-24">
       <main className="max-w-[900px] mx-auto mt-24 text-center px-6">
         
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-outline-variant bg-surface-container-low text-xs font-medium text-on-surface mb-8">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Powered by GenLayer AI Consensus
-        </div>
-
-        <h1 className="text-[clamp(3rem,5vw,4.5rem)] font-headline font-black leading-[1.1] tracking-tight mb-6 text-primary">
+        <h1 className="text-[clamp(3rem,5vw,4.5rem)] font-headline font-black leading-[1.1] tracking-tight mb-6 text-primary mt-12">
           Distribute hackathon prizes <br />
           <span className="text-on-surface-variant">without the arguments.</span>
         </h1>
@@ -43,15 +38,16 @@ export default function Home() {
             onClick={handleMainAction} 
             className="flex items-center gap-2 bg-primary text-on-primary px-8 py-3.5 rounded text-base font-bold hover:opacity-90 transition-all shadow-xl active:scale-[0.98]"
           >
-            {isConnected ? 'Go to Dashboard' : 'Connect Wallet'}
+            {isConnected ? 'Enter Dashboard' : 'Connect Wallet'}
             <ArrowRight size={18} />
           </button>
-          <Link 
-            href="/how-it-works" 
+          <a 
+            href="#" 
+            onClick={(e) => e.preventDefault()}
             className="flex items-center gap-2 bg-surface-container-high border border-outline-variant text-on-surface px-8 py-3.5 rounded text-base font-bold hover:bg-surface-variant transition-all active:scale-[0.98]"
           >
             Read the Docs
-          </Link>
+          </a>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">

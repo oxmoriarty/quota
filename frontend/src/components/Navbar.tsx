@@ -18,27 +18,6 @@ export function Navbar() {
           <Link href="/" className="flex items-center group">
             <Image src="/quotalogo.svg" alt="Quota Logo" width={120} height={40} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-auto h-10" priority />
           </Link>
-
-          <nav className="flex gap-6">
-            <Link 
-              href="/dashboard" 
-              className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              href="/projects" 
-              className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Explore
-            </Link>
-            <Link 
-              href="/how-it-works" 
-              className="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Docs
-            </Link>
-          </nav>
         </div>
 
         <div className="flex items-center gap-4">
