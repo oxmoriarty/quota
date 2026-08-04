@@ -11,8 +11,18 @@ export default function RegisterPage() {
   const { disconnect } = useDisconnect();
   const router = useRouter();
   const [username, setUsername] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selected = e.target.files[0];
+      setFile(selected);
+      setPreview(URL.createObjectURL(selected));
+    }
+  };
 
   useEffect(() => {
     if (!isConnected) {
@@ -55,12 +65,32 @@ export default function RegisterPage() {
         setLoading(false);
         return;
       }
+      // Upload Avatar if file exists
+      let avatarUrl = null;
+      if (file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${address}-${Math.random()}.${fileExt}`;
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          throw new Error('Failed to upload profile picture: ' + uploadError.message);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+          
+        avatarUrl = publicUrlData.publicUrl;
+      }
       
       const { error: insertError } = await supabase
         .from('users')
         .upsert({
           wallet_address: address?.toLowerCase(),
-          username: username.trim()
+          username: username.trim(),
+          avatar_url: avatarUrl
         }, { onConflict: 'wallet_address' });
         
       if (insertError) throw insertError;
@@ -99,6 +129,25 @@ export default function RegisterPage() {
               className="bg-surface-container-highest border border-outline-variant rounded px-4 py-3 text-base w-full focus:outline-none focus:border-primary text-on-surface transition-colors"
               placeholder="e.g. Satoshi"
             />
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <label className="text-[11px] uppercase tracking-widest font-bold text-on-surface-variant">Profile Picture (Optional)</label>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-surface-container-highest border border-outline-variant flex items-center justify-center overflow-hidden shrink-0">
+                {preview ? (
+                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-on-surface-variant text-xs">None</span>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all cursor-pointer"
+              />
+            </div>
           </div>
           
           {error && (

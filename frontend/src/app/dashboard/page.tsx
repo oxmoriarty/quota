@@ -77,9 +77,6 @@ export default function DashboardPage() {
               <button onClick={() => alert("No new notifications")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <Bell size={20} />
               </button>
-              <button onClick={() => alert("Profile coming soon!")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
-                <User size={20} />
-              </button>
               <Link href="/create" className="bg-primary text-on-primary px-4 py-1.5 rounded text-sm font-semibold hover:bg-opacity-90 transition-all shadow-sm flex items-center gap-2">
                 <Plus size={16} /> Create Workspace
               </Link>

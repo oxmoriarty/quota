@@ -120,9 +120,6 @@ export default function CreateProject() {
               <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <Bell size={20} />
               </button>
-              <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
-                <User size={20} />
-              </button>
             </div>
           </div>
         </header>
@@ -132,13 +129,7 @@ export default function CreateProject() {
           <div className="w-full max-w-2xl">
             
             <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-surface-container-highest border border-outline-variant text-primary mb-4 shadow-inner">
-                <LayoutDashboard size={24} />
-              </div>
               <h1 className="text-3xl font-black font-headline text-primary tracking-tight mb-2">Create a Workspace</h1>
-              <p className="text-on-surface-variant text-sm max-w-md mx-auto">
-                Deploy a vault for your project.
-              </p>
             </div>
 
             <div className="bg-surface-container-low border border-outline-variant rounded-xl p-8 shadow-2xl">

@@ -5,10 +5,23 @@ import { usePathname } from 'next/navigation';
 import { Rocket, Clock, Settings, FileText, HelpCircle, Plus } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import Image from 'next/image';
+import { useModal } from 'connectkit';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Avatar } from '@/components/Avatar';
 
 export function Sidebar() {
   const pathname = usePathname();
   const { address } = useAccount();
+  const { setOpen } = useModal();
+  const [userProfile, setUserProfile] = useState<{username?: string, avatar_url?: string} | null>(null);
+
+  useEffect(() => {
+    if (address) {
+      supabase.from('users').select('username, avatar_url').eq('wallet_address', address.toLowerCase()).single()
+        .then(({ data }) => setUserProfile(data));
+    }
+  }, [address]);
 
   const isActive = (path: string) => pathname === path;
 
@@ -44,13 +57,28 @@ export function Sidebar() {
           <span className="font-body text-label-medium">Documentation</span>
         </Link>
         
-        <div className="flex items-center space-x-3 p-2 mt-4 overflow-hidden">
-          <div className="w-6 h-6 rounded-full border border-outline-variant bg-surface-bright flex items-center justify-center text-[10px]">
-             {address ? address.substring(2,4) : '?'}
-          </div>
-          <span className="text-sm font-medium text-on-surface truncate">
-            {address ? `${address.substring(0,6)}...${address.substring(38)}` : 'Not Connected'}
-          </span>
+        <div 
+          onClick={() => setOpen(true)}
+          className="flex items-center space-x-3 p-2 mt-4 rounded-lg bg-surface-container-low hover:bg-surface-bright border border-outline-variant cursor-pointer transition-all active:scale-[0.98] group"
+        >
+          {address ? (
+            <>
+              <Avatar url={userProfile?.avatar_url} username={userProfile?.username} size={28} />
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-sm font-bold text-on-surface truncate group-hover:text-primary transition-colors">
+                  {userProfile?.username || 'Unnamed'}
+                </span>
+                <span className="text-[10px] font-mono text-on-surface-variant truncate">
+                  {`${address.substring(0,6)}...${address.substring(38)}`}
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center space-x-3 w-full">
+              <div className="w-7 h-7 rounded-full bg-surface-bright border border-outline-variant flex items-center justify-center">?</div>
+              <span className="text-sm font-medium text-on-surface">Connect Wallet</span>
+            </div>
+          )}
         </div>
       </footer>
     </aside>
