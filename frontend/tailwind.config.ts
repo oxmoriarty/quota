@@ -10,69 +10,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Deep Slate Backgrounds
-        "background": "#020617", // Slate 950
-        "surface": "#020617",
-        "surface-dim": "#020617",
-        "surface-bright": "#0f172a", // Slate 900
+        "background": "var(--background)",
+        "surface": "var(--surface)",
+        "surface-dim": "var(--surface-dim)",
+        "surface-bright": "var(--surface-bright)",
+        "surface-container-lowest": "var(--surface-container-lowest)",
+        "surface-container-low": "var(--surface-container-low)",
+        "surface-container": "var(--surface-container)",
+        "surface-container-high": "var(--surface-container-high)",
+        "surface-container-highest": "var(--surface-container-highest)",
         
-        "surface-container-lowest": "#020617",
-        "surface-container-low": "#0f172a", 
-        "surface-container": "#1e293b", // Slate 800
-        "surface-container-high": "#1e293b", 
-        "surface-container-highest": "#334155", // Slate 700
+        "primary": "var(--primary)",
+        "on-primary": "var(--on-primary)",
+        "primary-container": "var(--primary-container)",
+        "on-primary-container": "var(--on-primary-container)",
+        "inverse-primary": "var(--inverse-primary)",
         
-        // Vibrant Indigo Primary
-        "primary": "#6366f1", // Indigo 500
-        "on-primary": "#ffffff",
-        "primary-container": "#4f46e5", // Indigo 600
-        "on-primary-container": "#e0e7ff",
-        "inverse-primary": "#818cf8",
+        "secondary": "var(--secondary)",
+        "on-secondary": "var(--on-secondary)",
+        "secondary-container": "var(--secondary-container)",
+        "on-secondary-container": "var(--on-secondary-container)",
         
-        // Muted Slate Secondary
-        "secondary": "#94a3b8", // Slate 400
-        "on-secondary": "#0f172a",
-        "secondary-container": "#1e293b",
-        "on-secondary-container": "#f1f5f9",
+        "tertiary": "var(--tertiary)",
+        "on-tertiary": "var(--on-tertiary)",
+        "tertiary-container": "var(--tertiary-container)",
+        "on-tertiary-container": "var(--on-tertiary-container)",
         
-        // Tertiary (Cyan/Teal accent for variety)
-        "tertiary": "#06b6d4", // Cyan 500
-        "on-tertiary": "#ffffff",
-        "tertiary-container": "#0891b2",
-        "on-tertiary-container": "#cffafe",
+        "on-surface": "var(--on-surface)",
+        "on-surface-variant": "var(--on-surface-variant)",
+        "inverse-surface": "var(--inverse-surface)",
+        "inverse-on-surface": "var(--inverse-on-surface)",
         
-        // Text / On-Surface
-        "on-surface": "#f8fafc", // Slate 50
-        "on-surface-variant": "#94a3b8", // Slate 400
-        "inverse-surface": "#f8fafc",
-        "inverse-on-surface": "#020617",
+        "outline": "var(--outline)",
+        "outline-variant": "var(--outline-variant)",
         
-        // Borders & Outlines
-        "outline": "#475569", // Slate 600
-        "outline-variant": "#1e293b", // Slate 800
-        "surface-tint": "#6366f1",
-        
-        // Fixed Colors
-        "primary-fixed": "#e0e7ff",
-        "on-primary-fixed": "#312e81",
-        "primary-fixed-dim": "#c7d2fe",
-        "on-primary-fixed-variant": "#3730a3",
-        
-        "secondary-fixed": "#f1f5f9",
-        "on-secondary-fixed": "#0f172a",
-        "secondary-fixed-dim": "#e2e8f0",
-        "on-secondary-fixed-variant": "#1e293b",
-        
-        "tertiary-fixed": "#cffafe",
-        "on-tertiary-fixed": "#164e63",
-        "tertiary-fixed-dim": "#a5f3fc",
-        "on-tertiary-fixed-variant": "#155e75",
-        
-        // Errors
-        "error": "#ef4444", // Red 500
-        "on-error": "#ffffff",
-        "error-container": "#991b1b",
-        "on-error-container": "#fee2e2"
+        "error": "var(--error)",
+        "on-error": "var(--on-error)",
       },
       borderRadius: {
         "DEFAULT": "0.25rem",
@@ -81,10 +54,10 @@ export default {
         "full": "9999px"
       },
       fontFamily: {
-        "headline": ["Geist", "sans-serif"],
-        "display": ["Geist", "sans-serif"],
-        "body": ["Geist", "sans-serif"],
-        "label": ["Geist", "sans-serif"]
+        "headline": ["var(--font-primary)", "sans-serif"],
+        "display": ["var(--font-primary)", "sans-serif"],
+        "body": ["var(--font-primary)", "sans-serif"],
+        "label": ["var(--font-primary)", "sans-serif"]
       }
     },
   },

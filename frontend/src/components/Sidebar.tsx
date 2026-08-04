@@ -29,8 +29,13 @@ export function Sidebar() {
     <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 space-y-6 z-20">
       {/* Brand / Header */}
       <Link href="/" className="flex items-center px-2 group">
-        <div className="flex items-center justify-center transition-transform group-hover:scale-105 w-full mt-2">
-          <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
+        <div className="flex items-center justify-center transition-transform group-hover:scale-105 w-full mt-1 -translate-y-1">
+          <div className="hidden dark:block">
+            <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
+          </div>
+          <div className="block dark:hidden">
+            <Image src="/quotalogoblack.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
+          </div>
         </div>
       </Link>
 
