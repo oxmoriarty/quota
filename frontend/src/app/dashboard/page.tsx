@@ -13,6 +13,14 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Filter and Sort State
+  const [filter, setFilter] = useState('All'); // All, Active, Pending, Reviewed, Closed
+  const [sort, setSort] = useState('Newest'); // Newest, Oldest
 
   useEffect(() => {
     async function fetchData() {
@@ -47,7 +55,37 @@ export default function DashboardPage() {
     );
   }
 
-  const activeProjects = projects.filter(p => p.status !== 'Distribution Complete' && p.status !== 'No Prize Awarded' && p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  // Apply Filters
+  let filteredProjects = projects.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  
+  if (filter === 'Active') {
+    filteredProjects = filteredProjects.filter(p => p.status === 'Submissions Open');
+  } else if (filter === 'Pending') {
+    filteredProjects = filteredProjects.filter(p => p.status === 'Evaluation Pending' || p.status === 'Under Evaluation');
+  } else if (filter === 'Reviewed') {
+    filteredProjects = filteredProjects.filter(p => p.status === 'Allocation Finalized');
+  } else if (filter === 'Closed') {
+    filteredProjects = filteredProjects.filter(p => p.status === 'Distribution Complete' || p.status === 'No Prize Awarded');
+  }
+
+  // Apply Sorting
+  filteredProjects.sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime();
+    const dateB = new Date(b.created_at).getTime();
+    return sort === 'Newest' ? dateB - dateA : dateA - dateB;
+  });
+
+  // Pagination Logic
+  const totalProjects = filteredProjects.length;
+  const totalPages = Math.ceil(totalProjects / itemsPerPage);
+  
+  // Ensure we don't end up on a blank page if we filter heavily
+  if (currentPage > totalPages && totalPages > 0) setCurrentPage(1);
+
+  const paginatedProjects = filteredProjects.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
@@ -56,7 +94,7 @@ export default function DashboardPage() {
         {/* TopAppBar */}
         <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
           <div className="flex items-center space-x-4">
-            <h1 className="font-headline text-2xl font-semibold text-on-surface tracking-tight">Overview</h1>
+            <h1 className="font-headline text-2xl font-semibold text-on-surface tracking-tight">Dashboard</h1>
           </div>
           <div className="flex items-center space-x-6">
             <div className="relative group">
@@ -91,7 +129,7 @@ export default function DashboardPage() {
             <div className="bg-surface-container-low border border-outline-variant p-4 rounded-lg">
               <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Total Active</p>
               <div className="flex items-baseline space-x-2">
-                <h3 className="text-2xl font-headline font-bold text-primary">{activeProjects.length < 10 ? `0${activeProjects.length}` : activeProjects.length}</h3>
+                <h3 className="text-2xl font-headline font-bold text-primary">{projects.filter(p => p.status === 'Submissions Open').length < 10 ? `0${projects.filter(p => p.status === 'Submissions Open').length}` : projects.filter(p => p.status === 'Submissions Open').length}</h3>
                 <span className="text-xs text-green-500 font-medium">+1 this week</span>
               </div>
             </div>
@@ -121,17 +159,34 @@ export default function DashboardPage() {
           </div>
 
           {/* Table Header */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 mt-8">
             <h2 className="text-sm font-bold text-on-surface uppercase tracking-widest">Active Hackathon Projects</h2>
-            <div className="flex items-center space-x-2">
-              <button onClick={() => alert("Filter functionality coming soon")} className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
-                <Filter size={14} />
-                <span>Filter</span>
-              </button>
-              <button onClick={() => alert("Sort functionality coming soon")} className="text-xs flex items-center space-x-1 px-3 py-1.5 bg-surface-container-high border border-outline-variant rounded hover:bg-surface-bright transition-all">
-                <ArrowUpDown size={14} />
-                <span>Sort</span>
-              </button>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Filter size={14} className="text-on-surface-variant" />
+                <select 
+                  className="text-xs bg-surface-container-high border border-outline-variant rounded px-2 py-1 focus:outline-none focus:border-primary text-on-surface"
+                  value={filter}
+                  onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
+                >
+                  <option value="All">All Projects</option>
+                  <option value="Active">Active</option>
+                  <option value="Pending">Pending Review</option>
+                  <option value="Reviewed">Reviewed</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+              <div className="flex items-center space-x-2">
+                <ArrowUpDown size={14} className="text-on-surface-variant" />
+                <select 
+                  className="text-xs bg-surface-container-high border border-outline-variant rounded px-2 py-1 focus:outline-none focus:border-primary text-on-surface"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="Newest">Newest First</option>
+                  <option value="Oldest">Oldest First</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -148,13 +203,13 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant">
-                {activeProjects.length === 0 ? (
+                {paginatedProjects.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant text-sm">
-                      No active projects found. <Link href="/create" className="text-primary hover:underline">Create one now.</Link>
+                      No projects found. <Link href="/create" className="text-primary hover:underline">Create one now.</Link>
                     </td>
                   </tr>
-                ) : activeProjects.map(p => (
+                ) : paginatedProjects.map(p => (
                   <tr key={p.id} className="hover:bg-surface-bright transition-all group relative cursor-pointer" onClick={() => window.location.href=`/project/${p.id}`}>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
@@ -193,6 +248,31 @@ export default function DashboardPage() {
             </table>
           </div>
 
+          {/* Pagination Controls */}
+          {totalPages > 0 && (
+            <div className="flex items-center justify-between mt-4 mb-8">
+              <p className="text-xs text-on-surface-variant font-medium">
+                Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalProjects)} - {Math.min(currentPage * itemsPerPage, totalProjects)} of {totalProjects} Projects
+              </p>
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-surface-container-high border border-outline-variant rounded text-xs font-bold hover:bg-surface-bright disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Previous
+                </button>
+                <button 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 bg-surface-container-high border border-outline-variant rounded text-xs font-bold hover:bg-surface-bright disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Bento-Style Bottom Section */}
           <div className="mt-8 grid grid-cols-12 gap-6 pb-12">
             <div className="col-span-8 bg-surface-container-low border border-outline-variant p-6 rounded-lg">
@@ -218,10 +298,10 @@ export default function DashboardPage() {
                   <Activity size={16} />
                   <h3 className="text-xs font-bold uppercase tracking-widest">Recent Project</h3>
                 </div>
-                {activeProjects.length > 0 ? (
+                {projects.length > 0 ? (
                   <>
-                    <p className="text-xl font-headline font-bold text-on-surface mb-1 truncate">{activeProjects[0].name}</p>
-                    <p className="text-sm text-on-surface-variant font-medium">{activeProjects[0].status}</p>
+                    <p className="text-xl font-headline font-bold text-on-surface mb-1 truncate">{projects[0].name}</p>
+                    <p className="text-sm text-on-surface-variant font-medium">{projects[0].status}</p>
                   </>
                 ) : (
                   <>
@@ -230,8 +310,8 @@ export default function DashboardPage() {
                   </>
                 )}
               </div>
-              <Link href={activeProjects.length > 0 ? `/project/${activeProjects[0].id}` : '/create'} className="relative z-10 mt-6 w-full py-2 flex items-center justify-center bg-surface-container-low border border-outline-variant text-primary text-xs font-bold rounded hover:bg-primary/10 transition-all">
-                {activeProjects.length > 0 ? 'OPEN WORKSPACE' : 'NEW WORKSPACE'}
+              <Link href={projects.length > 0 ? `/project/${projects[0].id}` : '/create'} className="relative z-10 mt-6 w-full py-2 flex items-center justify-center bg-surface-container-low border border-outline-variant text-primary text-xs font-bold rounded hover:bg-primary/10 transition-all">
+                {projects.length > 0 ? 'OPEN WORKSPACE' : 'NEW WORKSPACE'}
               </Link>
               <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700"></div>
             </div>

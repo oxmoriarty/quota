@@ -29,26 +29,30 @@ export function Sidebar() {
     <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 space-y-6 z-20">
       {/* Brand / Header */}
       <Link href="/" className="flex items-center px-2 group">
-        <div className="flex items-center justify-center transition-transform group-hover:scale-105">
-          <Image src="/quotalogo.svg" alt="Quota Logo" width={140} height={48} className="drop-shadow-lg object-contain w-auto h-12" priority />
+        <div className="flex items-center justify-center transition-transform group-hover:scale-105 w-full mt-2">
+          <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
         </div>
       </Link>
 
       {/* Navigation Tabs */}
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-2 mt-4">
         <div className="px-2 py-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider opacity-50">Workspace</div>
         
-        <Link href="/dashboard" className={`flex items-center space-x-3 p-2 rounded-lg transition-colors duration-150 cursor-pointer active:scale-[0.98] ${isActive('/dashboard') ? 'text-primary font-bold bg-secondary-container/30' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-bright'}`}>
+        <Link href="/dashboard" className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-150 cursor-pointer active:scale-[0.98] ${isActive('/dashboard') ? 'text-primary font-bold bg-secondary-container/30 border border-primary/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-bright border border-transparent'}`}>
           <Rocket size={20} />
           <span className="font-body text-label-medium antialiased">Active Projects</span>
         </Link>
+        
+        <Link href="/create" className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-150 cursor-pointer active:scale-[0.98] ${isActive('/create') ? 'text-primary font-bold bg-secondary-container/30 border border-primary/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-bright border border-transparent'}`}>
+          <Plus size={20} />
+          <span className="font-body text-label-medium antialiased">New Project</span>
+        </Link>
+        
+        <Link href="/settings" className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-150 cursor-pointer active:scale-[0.98] ${isActive('/settings') ? 'text-primary font-bold bg-secondary-container/30 border border-primary/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-bright border border-transparent'}`}>
+          <Settings size={20} />
+          <span className="font-body text-label-medium antialiased">Settings</span>
+        </Link>
       </nav>
-
-      {/* CTA */}
-      <Link href="/create" className="w-full bg-primary text-on-primary font-bold py-2.5 rounded hover:bg-opacity-90 transition-all flex items-center justify-center space-x-2 text-sm cursor-pointer">
-        <Plus size={16} />
-        <span>New Project</span>
-      </Link>
 
       {/* Footer Tabs */}
       <footer className="pt-4 border-t border-outline-variant space-y-1">

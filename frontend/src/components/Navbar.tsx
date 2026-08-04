@@ -16,7 +16,7 @@ export function Navbar() {
       <div className="flex justify-between items-center w-full max-w-[1200px] px-6 py-4">
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center group">
-            <Image src="/quotalogo.svg" alt="Quota Logo" width={120} height={40} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-auto h-10" priority />
+            <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-auto h-[70px]" priority />
           </Link>
         </div>
 

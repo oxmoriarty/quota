@@ -73,8 +73,8 @@ export default function HowItWorksPage() {
         <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[50%] bg-tertiary/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
         <section className="px-8 py-20 max-w-4xl mx-auto w-full flex flex-col items-center text-center">
-          <div className="animate-header mb-8 inline-flex items-center justify-center p-4 rounded-2xl bg-surface-container-highest border border-outline-variant shadow-2xl">
-            <Image src="/quotalogo.svg" alt="Quota" width={160} height={60} className="drop-shadow-lg object-contain w-auto h-16" priority />
+          <div className="animate-header mb-8 inline-flex items-center justify-center p-6 rounded-3xl bg-surface-container-highest border border-outline-variant shadow-2xl">
+            <Image src="/quotalogo.svg" alt="Quota" width={320} height={100} className="drop-shadow-lg object-contain w-auto h-28" priority />
           </div>
           <h1 className="animate-header text-5xl md:text-6xl font-black font-headline tracking-tighter text-on-surface mb-6">
             The Future of <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-tertiary">Fair Distribution</span>
