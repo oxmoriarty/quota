@@ -260,7 +260,7 @@ export default function SettingsPage() {
                     <div className="bg-surface-container-low border border-primary/30 p-5 rounded-lg flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
-                          <Image src="/ethereumlogo.svg" alt="Ethereum" width={24} height={24} className="object-contain" />
+                          <Image src="/ethereumlogo.svg" alt="Ethereum" width={40} height={40} className="object-cover scale-[1.2]" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">EVM Wallet</p>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
                     <div className="bg-surface-container-low border border-outline-variant p-5 rounded-lg flex items-center justify-between opacity-70">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
-                          <Image src="/solanalogo.svg" alt="Solana" width={24} height={24} className="object-contain" />
+                          <Image src="/solanalogo.svg" alt="Solana" width={40} height={40} className="object-cover scale-[1.2]" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">Solana Wallet</p>
@@ -286,7 +286,7 @@ export default function SettingsPage() {
                     <div className="bg-surface-container-low border border-outline-variant p-5 rounded-lg flex items-center justify-between opacity-70">
                       <div className="flex items-center space-x-4">
                         <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
-                          <Image src="/suilogo.svg" alt="Sui" width={24} height={24} className="object-contain" />
+                          <Image src="/suilogo.svg" alt="Sui" width={40} height={40} className="object-cover scale-[1.2]" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">Sui Wallet</p>

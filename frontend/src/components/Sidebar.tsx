@@ -29,7 +29,7 @@ export function Sidebar() {
     <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col z-20">
       {/* Brand / Header */}
       <div className="h-16 w-full flex items-center justify-center border-b border-transparent relative">
-        <Link href="/" className="flex items-center group absolute -bottom-3 translate-y-1">
+        <Link href="/" className="flex items-center group absolute -bottom-2 translate-y-0">
           <div className="hidden dark:block">
             <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
           </div>

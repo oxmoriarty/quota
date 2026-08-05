@@ -227,15 +227,43 @@ export default function DashboardPage() {
                       <span className="text-sm font-mono text-on-surface">TBD {p.prize_token}</span>
                     </td>
                     <td className="px-6 py-4">
-                      {p.status === 'Submissions Open' ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                          {p.status}
-                        </span>
-                      )}
+                      {(() => {
+                        const s = p.status;
+                        let colorClass = "bg-surface-container-high text-on-surface-variant border-outline-variant";
+                        let dotClass = "bg-on-surface-variant";
+                        let label = s;
+
+                        if (s === 'Submissions Open') {
+                          colorClass = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+                          dotClass = "bg-emerald-500";
+                          label = "Active";
+                        } else if (s === 'Submissions Closed') {
+                          colorClass = "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
+                          dotClass = "bg-slate-500";
+                        } else if (s === 'Evaluation Pending') {
+                          colorClass = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
+                          dotClass = "bg-amber-500";
+                        } else if (s === 'Under Evaluation') {
+                          colorClass = "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20";
+                          dotClass = "bg-indigo-500";
+                        } else if (s === 'Allocation Finalized') {
+                          colorClass = "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
+                          dotClass = "bg-purple-500";
+                        } else if (s === 'Distribution Complete') {
+                          colorClass = "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20";
+                          dotClass = "bg-teal-500";
+                        } else if (s === 'No Prize Awarded') {
+                          colorClass = "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
+                          dotClass = "bg-rose-500";
+                        }
+
+                        return (
+                          <div className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-sm shadow-sm ${colorClass}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${dotClass} shadow-[0_0_8px_rgba(0,0,0,0.5)] shadow-${dotClass.split('-')[1]}-500/50`} />
+                            <span>{label}</span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button className="text-on-surface-variant hover:text-primary transition-colors" onClick={(e) => { e.stopPropagation(); }}>
