@@ -26,21 +26,21 @@ export function Sidebar() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 space-y-6 z-20">
+    <aside className="h-screen w-64 fixed left-0 top-0 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col z-20">
       {/* Brand / Header */}
-      <Link href="/" className="flex items-center px-2 group">
-        <div className="flex items-center justify-center transition-transform group-hover:scale-105 w-full mt-1 -translate-y-1">
+      <div className="h-16 w-full flex items-center justify-center border-b border-transparent relative">
+        <Link href="/" className="flex items-center group absolute -bottom-3 translate-y-1">
           <div className="hidden dark:block">
             <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
           </div>
           <div className="block dark:hidden">
             <Image src="/quotalogoblack.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-auto h-[70px]" priority />
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex-1 space-y-2 mt-4">
+      <nav className="flex-1 space-y-2 mt-4 px-4">
         <div className="px-2 py-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider opacity-50">Workspace</div>
         
         <Link href="/dashboard" className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-150 cursor-pointer active:scale-[0.98] ${isActive('/dashboard') ? 'text-primary font-bold bg-secondary-container/30 border border-primary/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-bright border border-transparent'}`}>
@@ -60,7 +60,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Tabs */}
-      <footer className="pt-4 border-t border-outline-variant space-y-1">
+      <footer className="pt-4 pb-4 px-4 border-t border-outline-variant space-y-1">
         <Link href="/how-it-works" className="flex items-center space-x-3 p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-bright transition-colors duration-150 cursor-pointer">
           <FileText size={20} />
           <span className="font-body text-label-medium">Documentation</span>

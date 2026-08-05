@@ -6,38 +6,71 @@ import { useTheme } from 'next-themes';
 import { Sidebar } from '@/components/Sidebar';
 import { Bell, User, Moon, Sun, Wallet, Mail, Palette, Monitor } from 'lucide-react';
 import { FaGithub, FaXTwitter, FaTelegram } from 'react-icons/fa6';
-import { SiGmail, SiEthereum, SiSolana } from 'react-icons/si';
+import { SiGmail } from 'react-icons/si';
 import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const { address } = useAccount();
-  const { theme, setTheme, systemTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('profile'); 
   const [userProfile, setUserProfile] = useState<{username?: string, avatar_url?: string, role?: string, bio?: string} | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  // Theme states for UI rendering
+  const [activeColor, setActiveColor] = useState('indigo');
+  const [activeFontSize, setActiveFontSize] = useState('md');
+  const [activeFontFamily, setActiveFontFamily] = useState('geist');
 
   useEffect(() => {
     if (address) {
+      setIsLoadingProfile(true);
       supabase.from('users').select('username, avatar_url, role, bio').eq('wallet_address', address.toLowerCase()).single()
-        .then(({ data }) => setUserProfile(data));
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setUserProfile(data);
+          }
+          setIsLoadingProfile(false);
+        });
+    } else {
+      setIsLoadingProfile(false);
     }
   }, [address]);
 
+  // Load custom themes from localStorage on mount
+  useEffect(() => {
+    const savedColor = localStorage.getItem('quota-color-theme') || 'indigo';
+    const savedSize = localStorage.getItem('quota-font-size') || 'md';
+    const savedFont = localStorage.getItem('quota-font-family') || 'geist';
+    
+    setActiveColor(savedColor);
+    setActiveFontSize(savedSize);
+    setActiveFontFamily(savedFont);
+
+    document.documentElement.setAttribute('data-color-theme', savedColor);
+    document.documentElement.setAttribute('data-font-size', savedSize);
+    document.documentElement.setAttribute('data-font-family', savedFont);
+  }, []);
+
   // Color Theme Switcher
   const setThemeColor = (color: string) => {
-    document.documentElement.className = document.documentElement.className.replace(/theme-\w+/g, '');
-    document.documentElement.classList.add(`theme-${color}`);
+    setActiveColor(color);
+    document.documentElement.setAttribute('data-color-theme', color);
+    localStorage.setItem('quota-color-theme', color);
   };
 
   // Font Size Switcher
   const setFontSize = (size: string) => {
-    document.documentElement.className = document.documentElement.className.replace(/font-size-\w+/g, '');
-    document.documentElement.classList.add(`font-size-${size}`);
+    setActiveFontSize(size);
+    document.documentElement.setAttribute('data-font-size', size);
+    localStorage.setItem('quota-font-size', size);
   };
 
   // Font Family Switcher
   const setFontFamily = (font: string) => {
-    document.documentElement.className = document.documentElement.className.replace(/font-family-\w+/g, '');
-    document.documentElement.classList.add(`font-family-${font}`);
+    setActiveFontFamily(font);
+    document.documentElement.setAttribute('data-font-family', font);
+    localStorage.setItem('quota-font-family', font);
   };
 
   return (
@@ -106,7 +139,7 @@ export default function SettingsPage() {
                   <div className="bg-surface-container-low border border-outline-variant p-6 rounded-lg space-y-6">
                     <div className="flex flex-col gap-2">
                       <label className="text-xs uppercase font-bold text-on-surface-variant tracking-widest">Username</label>
-                      <input type="text" className="bg-surface-container-highest border border-outline-variant rounded px-4 py-2 text-sm w-full focus:border-primary focus:outline-none" value={userProfile?.username || 'Loading...'} disabled />
+                      <input type="text" className="bg-surface-container-highest border border-outline-variant rounded px-4 py-2 text-sm w-full focus:border-primary focus:outline-none" value={isLoadingProfile ? 'Loading...' : (userProfile?.username || 'Not registered')} disabled />
                       <p className="text-[10px] text-on-surface-variant">Usernames cannot be changed once registered.</p>
                     </div>
                     
@@ -166,7 +199,7 @@ export default function SettingsPage() {
                   <h2 className="text-xl font-bold font-headline mb-1">Appearance</h2>
                   <p className="text-sm text-on-surface-variant mb-6">Customize how Quota looks on your device.</p>
                   
-                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3">Color Mode</h3>
+                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3">MODE</h3>
                   <div className="grid grid-cols-3 gap-4 mb-8">
                     <button onClick={() => setTheme('dark')} className={`flex flex-col items-center justify-center p-6 border-2 rounded-xl transition-all ${theme === 'dark' ? 'bg-surface-container-high border-primary text-primary' : 'bg-surface-container-low border-transparent hover:bg-surface-bright text-on-surface-variant'}`}>
                       <Moon size={24} className="mb-3" />
@@ -182,33 +215,33 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3">Accent Color</h3>
+                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3">THEME</h3>
                   <div className="flex space-x-4 mb-8">
-                    <button onClick={() => setThemeColor('indigo')} className="w-12 h-12 rounded-full bg-[#6366f1] ring-2 ring-transparent focus:ring-on-surface transition-all active:scale-95"></button>
-                    <button onClick={() => setThemeColor('emerald')} className="w-12 h-12 rounded-full bg-[#10b981] ring-2 ring-transparent focus:ring-on-surface transition-all active:scale-95"></button>
-                    <button onClick={() => setThemeColor('rose')} className="w-12 h-12 rounded-full bg-[#f43f5e] ring-2 ring-transparent focus:ring-on-surface transition-all active:scale-95"></button>
-                    <button onClick={() => setThemeColor('amber')} className="w-12 h-12 rounded-full bg-[#f59e0b] ring-2 ring-transparent focus:ring-on-surface transition-all active:scale-95"></button>
-                    <button onClick={() => setThemeColor('amethyst')} className="w-12 h-12 rounded-full bg-[#a855f7] ring-2 ring-transparent focus:ring-on-surface transition-all active:scale-95"></button>
+                    <button onClick={() => setThemeColor('indigo')} className={`w-12 h-12 rounded-full bg-[#6366f1] ring-2 transition-all active:scale-95 ${activeColor === 'indigo' ? 'ring-on-surface ring-offset-2 ring-offset-background' : 'ring-transparent focus:ring-on-surface'}`}></button>
+                    <button onClick={() => setThemeColor('emerald')} className={`w-12 h-12 rounded-full bg-[#10b981] ring-2 transition-all active:scale-95 ${activeColor === 'emerald' ? 'ring-on-surface ring-offset-2 ring-offset-background' : 'ring-transparent focus:ring-on-surface'}`}></button>
+                    <button onClick={() => setThemeColor('rose')} className={`w-12 h-12 rounded-full bg-[#f43f5e] ring-2 transition-all active:scale-95 ${activeColor === 'rose' ? 'ring-on-surface ring-offset-2 ring-offset-background' : 'ring-transparent focus:ring-on-surface'}`}></button>
+                    <button onClick={() => setThemeColor('amber')} className={`w-12 h-12 rounded-full bg-[#f59e0b] ring-2 transition-all active:scale-95 ${activeColor === 'amber' ? 'ring-on-surface ring-offset-2 ring-offset-background' : 'ring-transparent focus:ring-on-surface'}`}></button>
+                    <button onClick={() => setThemeColor('amethyst')} className={`w-12 h-12 rounded-full bg-[#a855f7] ring-2 transition-all active:scale-95 ${activeColor === 'amethyst' ? 'ring-on-surface ring-offset-2 ring-offset-background' : 'ring-transparent focus:ring-on-surface'}`}></button>
                   </div>
 
-                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3 mt-8">Typography Scaling</h3>
+                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3 mt-8">FONT SIZE</h3>
                   <div className="flex bg-surface-container-highest rounded-lg p-1 w-full max-w-sm">
-                    <button onClick={() => setFontSize('sm')} className="flex-1 py-2 text-sm font-medium rounded hover:bg-surface focus:bg-primary focus:text-on-primary">Small</button>
-                    <button onClick={() => setFontSize('md')} className="flex-1 py-2 text-sm font-medium rounded hover:bg-surface focus:bg-primary focus:text-on-primary">Default</button>
-                    <button onClick={() => setFontSize('lg')} className="flex-1 py-2 text-sm font-medium rounded hover:bg-surface focus:bg-primary focus:text-on-primary">Large</button>
+                    <button onClick={() => setFontSize('sm')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'sm' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Small</button>
+                    <button onClick={() => setFontSize('md')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'md' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Default</button>
+                    <button onClick={() => setFontSize('lg')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'lg' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Large</button>
                   </div>
 
-                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3 mt-8">Font Style Picker</h3>
+                  <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3 mt-8">FONT</h3>
                   <div className="grid grid-cols-3 gap-4 mb-8">
-                    <button onClick={() => setFontFamily('geist')} className="flex flex-col items-center justify-center p-4 bg-surface-container-low border border-outline-variant rounded-xl hover:bg-surface-bright hover:border-primary transition-all">
+                    <button onClick={() => setFontFamily('geist')} className={`flex flex-col items-center justify-center p-4 bg-surface-container-low border rounded-xl hover:bg-surface-bright transition-all ${activeFontFamily === 'geist' ? 'border-primary' : 'border-outline-variant'}`}>
                       <span className="text-2xl font-bold mb-2 font-sans">Ag</span>
                       <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Geist (Modern)</span>
                     </button>
-                    <button onClick={() => setFontFamily('inter')} className="flex flex-col items-center justify-center p-4 bg-surface-container-low border border-outline-variant rounded-xl hover:bg-surface-bright hover:border-primary transition-all">
+                    <button onClick={() => setFontFamily('inter')} className={`flex flex-col items-center justify-center p-4 bg-surface-container-low border rounded-xl hover:bg-surface-bright transition-all ${activeFontFamily === 'inter' ? 'border-primary' : 'border-outline-variant'}`}>
                       <span className="text-2xl font-bold mb-2" style={{ fontFamily: 'system-ui, sans-serif' }}>Ag</span>
                       <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Inter (Clean)</span>
                     </button>
-                    <button onClick={() => setFontFamily('mono')} className="flex flex-col items-center justify-center p-4 bg-surface-container-low border border-outline-variant rounded-xl hover:bg-surface-bright hover:border-primary transition-all">
+                    <button onClick={() => setFontFamily('mono')} className={`flex flex-col items-center justify-center p-4 bg-surface-container-low border rounded-xl hover:bg-surface-bright transition-all ${activeFontFamily === 'mono' ? 'border-primary' : 'border-outline-variant'}`}>
                       <span className="text-2xl font-bold mb-2 font-mono">Ag</span>
                       <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Mono (Code)</span>
                     </button>
@@ -226,8 +259,8 @@ export default function SettingsPage() {
                   <div className="space-y-4">
                     <div className="bg-surface-container-low border border-primary/30 p-5 rounded-lg flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-full bg-[#627EEA]/10 flex items-center justify-center border border-[#627EEA]/20">
-                          <SiEthereum className="text-[#627EEA]" size={20} />
+                        <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
+                          <Image src="/ethereumlogo.svg" alt="Ethereum" width={24} height={24} className="object-contain" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">EVM Wallet</p>
@@ -239,8 +272,8 @@ export default function SettingsPage() {
 
                     <div className="bg-surface-container-low border border-outline-variant p-5 rounded-lg flex items-center justify-between opacity-70">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-full bg-[#14F195]/10 flex items-center justify-center border border-[#14F195]/20">
-                          <SiSolana className="text-[#14F195]" size={20} />
+                        <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
+                          <Image src="/solanalogo.svg" alt="Solana" width={24} height={24} className="object-contain" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">Solana Wallet</p>
@@ -252,8 +285,8 @@ export default function SettingsPage() {
 
                     <div className="bg-surface-container-low border border-outline-variant p-5 rounded-lg flex items-center justify-between opacity-70">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-full bg-[#4CA2FF]/10 flex items-center justify-center border border-[#4CA2FF]/20">
-                          <div className="w-5 h-5 rounded-full bg-[#4CA2FF] flex items-center justify-center text-[10px] text-white font-bold">S</div>
+                        <div className="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center border border-outline-variant overflow-hidden">
+                          <Image src="/suilogo.svg" alt="Sui" width={24} height={24} className="object-contain" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">Sui Wallet</p>
