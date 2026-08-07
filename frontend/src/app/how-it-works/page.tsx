@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { Sidebar } from '@/components/Sidebar';
-import { Shield, Coins, FileCheck, CheckCircle2, Bot } from 'lucide-react';
+import { Shield, Coins, FileCheck, CheckCircle2, Bot, Menu } from 'lucide-react';
 import Image from 'next/image';
 
 // Safely import gsap (Next.js client-side compatibility)
@@ -11,6 +11,7 @@ const gsapInstance = typeof window !== 'undefined' ? require('gsap').default : n
 
 export default function HowItWorksPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   useEffect(() => {
     if (!gsapInstance || !containerRef.current) return;
@@ -64,10 +65,20 @@ export default function HowItWorksPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col relative h-screen overflow-y-auto custom-scrollbar" ref={containerRef}>
+    <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active overflow-hidden w-full">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 w-full md:ml-64 flex flex-col relative h-screen overflow-y-auto custom-scrollbar" ref={containerRef}>
         
+        {/* Mobile Header */}
+        <header className="md:hidden flex justify-between items-center h-14 px-4 sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-outline-variant">
+          <div className="flex items-center space-x-2">
+            <button onClick={() => setIsSidebarOpen(true)} className="p-1.5 -ml-2 text-on-surface hover:bg-surface-variant rounded-md">
+              <Menu size={20} />
+            </button>
+            <h1 className="font-headline text-lg font-semibold text-on-surface tracking-tight">Documentation</h1>
+          </div>
+        </header>
+
         {/* Background glow */}
         <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
         <div className="fixed bottom-[-20%] right-[-10%] w-[40%] h-[50%] bg-tertiary/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useTheme } from 'next-themes';
 import { Sidebar } from '@/components/Sidebar';
-import { Bell, User, Moon, Sun, Wallet, Mail, Palette, Monitor } from 'lucide-react';
+import { Bell, User, Moon, Sun, Wallet, Mail, Palette, Monitor, Menu } from 'lucide-react';
 import { FaGithub, FaXTwitter, FaTelegram } from 'react-icons/fa6';
 import { SiGmail } from 'react-icons/si';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +16,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile'); 
   const [userProfile, setUserProfile] = useState<{username?: string, avatar_url?: string, role?: string, bio?: string} | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Theme states for UI rendering
   const [activeColor, setActiveColor] = useState('indigo');
@@ -75,13 +76,16 @@ export default function SettingsPage() {
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
-      <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 w-full md:ml-64 flex flex-col min-h-screen">
         
         {/* TopAppBar */}
-        <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
-          <div className="flex items-center space-x-4">
-            <h1 className="font-headline text-2xl font-semibold text-on-surface tracking-tight">Settings</h1>
+        <header className="flex justify-between items-center h-14 md:h-16 px-4 md:px-8 sticky top-0 z-30 bg-background border-b border-outline-variant">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-1.5 -ml-2 text-on-surface hover:bg-surface-variant rounded-md">
+              <Menu size={20} />
+            </button>
+            <h1 className="font-headline text-xl md:text-2xl font-semibold text-on-surface tracking-tight hidden sm:block">Settings</h1>
           </div>
           <div className="flex items-center space-x-6">
             <button className="p-2 text-on-surface-variant hover:bg-surface-container-high rounded transition-all focus:ring-2 focus:ring-primary/20">
@@ -91,11 +95,11 @@ export default function SettingsPage() {
         </header>
 
         {/* Content */}
-        <section className="p-8 flex-1 overflow-y-auto flex">
+        <section className="p-4 md:p-8 flex-1 overflow-y-auto flex flex-col md:flex-row">
           
           {/* Settings Sidebar */}
-          <div className="w-64 border-r border-outline-variant pr-8 mr-8">
-            <nav className="space-y-2">
+          <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-outline-variant md:pr-8 md:mr-8 mb-6 md:mb-0">
+            <nav className="flex md:block space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
               <button 
                 onClick={() => setActiveTab('profile')}
                 className={`w-full flex items-center space-x-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === 'profile' ? 'bg-primary/10 text-primary' : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'}`}
@@ -128,7 +132,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Settings Content */}
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 w-full max-w-2xl">
             
             {activeTab === 'profile' && (
               <div className="space-y-8 animate-slide-up">
@@ -225,7 +229,7 @@ export default function SettingsPage() {
                   </div>
 
                   <h3 className="text-xs uppercase font-bold text-on-surface-variant tracking-widest mb-3 mt-8">FONT SIZE</h3>
-                  <div className="flex bg-surface-container-highest rounded-lg p-1 w-full max-w-sm">
+                  <div className="flex bg-surface-container-highest rounded-lg p-1 w-full flex-col sm:flex-row sm:max-w-sm">
                     <button onClick={() => setFontSize('sm')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'sm' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Small</button>
                     <button onClick={() => setFontSize('md')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'md' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Default</button>
                     <button onClick={() => setFontSize('lg')} className={`flex-1 py-2 text-sm font-medium rounded transition-all ${activeFontSize === 'lg' ? 'bg-primary text-on-primary' : 'hover:bg-surface'}`}>Large</button>

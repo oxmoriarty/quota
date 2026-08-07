@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Activity, Bell, FileText, Search, Zap, Clock, Shield, CheckCircle2, AlertTriangle, Filter, Plus, ArrowRight, User, ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { Activity, Bell, FileText, Search, Zap, Clock, Shield, CheckCircle2, AlertTriangle, Filter, Plus, ArrowRight, User, ArrowUpDown, MoreHorizontal, Menu } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 import { useUI } from '@/components/UIProvider';
 
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,8 +53,8 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen bg-background text-on-surface">
-        <Sidebar />
-        <main className="flex-1 ml-64 flex items-center justify-center min-h-screen">
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+        <main className="flex-1 w-full md:ml-64 flex items-center justify-center min-h-screen">
           <Activity className="animate-pulse text-on-surface-variant" size={24} />
         </main>
       </div>
@@ -94,15 +95,18 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
-      <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen overflow-x-hidden">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 w-full md:ml-64 flex flex-col min-h-screen overflow-x-hidden">
         {/* TopAppBar */}
-        <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
-          <div className="flex items-center space-x-4">
-            <h1 className="font-headline text-2xl font-semibold text-on-surface tracking-tight">Dashboard</h1>
+        <header className="flex justify-between items-center h-14 md:h-16 px-4 md:px-8 sticky top-0 z-30 bg-background border-b border-outline-variant">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-1.5 -ml-2 text-on-surface hover:bg-surface-variant rounded-md">
+              <Menu size={20} />
+            </button>
+            <h1 className="font-headline text-xl md:text-2xl font-semibold text-on-surface tracking-tight hidden sm:block">Dashboard</h1>
           </div>
-          <div className="flex items-center space-x-6">
-            <div className="relative group">
+          <div className="flex items-center space-x-2 md:space-x-6">
+            <div className="relative group hidden sm:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors" size={16} />
               <input 
                 className="bg-surface-container-low border border-outline-variant rounded px-10 py-1.5 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-on-surface-variant/50 text-on-surface" 
@@ -116,7 +120,7 @@ export default function DashboardPage() {
                 <kbd className="text-[10px] bg-surface-container-highest px-1.5 py-0.5 rounded border border-outline-variant font-sans opacity-60">K</kbd>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 md:space-x-3">
               <button onClick={() => toast("No new notifications", "info")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <Bell size={20} />
               </button>
@@ -130,12 +134,12 @@ export default function DashboardPage() {
         {/* Main Content Area */}
         <section className="p-8 flex-1 overflow-y-auto">
           {/* Summary Stats */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div className="bg-surface-container-low border border-outline-variant p-4 rounded-lg">
               <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Total Active</p>
               <div className="flex items-baseline space-x-2">
                 <h3 className="text-2xl font-headline font-bold text-primary">{projects.filter(p => p.status === 'Submissions Open').length < 10 ? `0${projects.filter(p => p.status === 'Submissions Open').length}` : projects.filter(p => p.status === 'Submissions Open').length}</h3>
-                <span className="text-xs text-green-500 font-medium">+1 this week</span>
+                <span className="text-xs text-green-500 font-medium">+1</span>
               </div>
             </div>
             <div className="bg-surface-container-low border border-outline-variant p-4 rounded-lg">
@@ -149,7 +153,7 @@ export default function DashboardPage() {
               <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Submissions</p>
               <div className="flex items-baseline space-x-2">
                 <h3 className="text-2xl font-headline font-bold text-primary">0</h3>
-                <span className="text-xs text-on-surface-variant opacity-50">Lifetime</span>
+                <span className="text-xs text-on-surface-variant opacity-50 hidden sm:inline">Lifetime</span>
               </div>
             </div>
             <div className="bg-surface-container-low border border-outline-variant p-4 rounded-lg relative overflow-hidden">
@@ -196,8 +200,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Project Table */}
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
-            <table className="w-full text-left border-collapse">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-x-auto">
+            <table className="w-full min-w-[600px] text-left border-collapse">
               <thead className="bg-surface-container-low border-b border-outline-variant">
                 <tr>
                   <th className="px-6 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Project Name</th>
@@ -307,8 +311,8 @@ export default function DashboardPage() {
           )}
 
           {/* Bento-Style Bottom Section */}
-          <div className="mt-8 grid grid-cols-12 gap-6 pb-12">
-            <div className="col-span-8 bg-surface-container-low border border-outline-variant p-6 rounded-lg">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-6 pb-12">
+            <div className="md:col-span-8 bg-surface-container-low border border-outline-variant p-6 rounded-lg">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-on-surface">System Activity</h3>
                 <span className="text-xs text-on-surface-variant hover:underline cursor-pointer">View full log</span>
@@ -324,7 +328,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="col-span-4 bg-surface-container-highest border border-outline-variant p-6 rounded-lg relative flex flex-col justify-between group overflow-hidden">
+            <div className="md:col-span-4 bg-surface-container-highest border border-outline-variant p-6 rounded-lg relative flex flex-col justify-between group overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
               <div className="relative z-10">
                 <div className="flex items-center space-x-2 text-primary mb-4">

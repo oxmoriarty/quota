@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { supabase } from '@/lib/supabase';
 import { closeSubmissionsOnGenLayer, startAIEvaluationOnGenLayer, appealOnGenLayer, getProjectFromGenLayer } from '@/lib/genlayer';
-import { Shield, Clock, Users, Zap, FileText, CheckCircle2, ChevronRight, AlertTriangle, ArrowRight, ExternalLink, Activity, Search, Bell, Terminal, Palette, Merge, Plus, Filter, Copy, Trash2 } from 'lucide-react';
+import { Shield, Clock, Users, Zap, FileText, CheckCircle2, ChevronRight, AlertTriangle, ArrowRight, ExternalLink, Activity, Search, Bell, Terminal, Palette, Merge, Plus, Filter, Copy, Trash2, Menu } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 import { useUI } from '@/components/UIProvider';
 
@@ -26,6 +26,7 @@ export default function ProjectWorkspace() {
   
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'evidence' | 'evaluation' | 'team'>('evidence');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Submission Form State
   const [desc, setDesc] = useState('');
@@ -173,24 +174,27 @@ export default function ProjectWorkspace() {
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active overflow-hidden w-full">
-      <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col relative h-screen">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 w-full md:ml-64 flex flex-col relative h-screen">
         
         {/* TopAppBar */}
-        <header className="bg-surface sticky top-0 w-full h-14 border-b border-outline-variant z-40 flex justify-between items-center px-6">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-6">
-              <span className="font-body text-sm font-semibold text-primary">{project.name}</span>
+        <header className="bg-surface sticky top-0 w-full h-14 md:h-16 border-b border-outline-variant z-30 flex justify-between items-center px-4 md:px-6">
+          <div className="flex items-center gap-2 md:gap-8">
+            <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-1.5 -ml-2 text-on-surface hover:bg-surface-variant rounded-md">
+              <Menu size={20} />
+            </button>
+            <div className="flex items-center gap-2 md:gap-6">
+              <span className="font-body text-sm font-semibold text-primary truncate max-w-[150px] sm:max-w-xs">{project.name}</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="relative group">
-              <input className="bg-surface-container border border-outline-variant rounded px-3 py-1 text-xs w-48 focus:w-64 transition-all focus:outline-none focus:border-primary text-on-surface hover:border-outline-variant/80" placeholder="Search evidence..." type="text"/>
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="relative group hidden sm:block">
+              <input className="bg-surface-container border border-outline-variant rounded px-3 py-1 text-xs w-32 md:w-48 focus:w-48 md:focus:w-64 transition-all focus:outline-none focus:border-primary text-on-surface hover:border-outline-variant/80" placeholder="Search evidence..." type="text"/>
               <Search className="absolute right-2 top-1.5 text-on-surface-variant" size={14} />
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={copyInviteLink} className="flex items-center gap-1.5 bg-surface-container border border-outline-variant px-3 py-1.5 rounded text-xs font-bold hover:bg-surface-variant hover:text-primary transition-all group">
-                <Copy size={14} className="group-hover:scale-110 transition-transform" /> Copy Link
+              <button onClick={copyInviteLink} className="flex items-center gap-1.5 bg-surface-container border border-outline-variant px-2 md:px-3 py-1.5 rounded text-xs font-bold hover:bg-surface-variant hover:text-primary transition-all group">
+                <Copy size={14} className="group-hover:scale-110 transition-transform" /> <span className="hidden sm:inline">Copy Link</span>
               </button>
               {isCreator && submissionsOpen && (
                 <button onClick={handleCloseSubmissions} className="bg-error/10 text-error border border-error/20 px-4 py-1.5 rounded text-xs font-bold hover:bg-error/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
@@ -225,9 +229,9 @@ export default function ProjectWorkspace() {
           {activeTab === 'evidence' && (
             <>
               {/* Page Heading */}
-              <div className="flex justify-between items-end mb-8">
+              <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
                 <div>
-                  <h1 className="text-3xl font-black tracking-tight text-on-surface mb-2 drop-shadow-sm">Evidence Vault</h1>
+                  <h1 className="text-2xl md:text-3xl font-black tracking-tight text-on-surface mb-2 drop-shadow-sm">Evidence Vault</h1>
                   <p className="text-on-surface-variant text-sm max-w-xl">
                     Repository of all technical contributions submitted for verification by the team.
                   </p>
@@ -274,8 +278,8 @@ export default function ProjectWorkspace() {
               )}
 
               {/* Data Table */}
-              <div className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse">
+              <div className="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-x-auto shadow-sm">
+                <table className="w-full min-w-[600px] text-left border-collapse">
                   <thead>
                     <tr className="bg-surface-container border-b border-outline-variant">
                       <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Contributor</th>
@@ -354,8 +358,8 @@ export default function ProjectWorkspace() {
                    <p className="text-sm text-on-surface-variant">The AI evaluation protocol has not been executed for this project yet.</p>
                  </div>
               ) : (
-                <div className="grid grid-cols-12 gap-8">
-                  <div className="col-span-8 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  <div className="lg:col-span-8 space-y-6">
                     <div className="bg-surface-container-low border border-outline-variant p-6 rounded-lg shadow-sm hover:border-primary/20 transition-colors">
                       <div className="flex items-center gap-2 mb-4 text-primary">
                         <Activity size={18} />
@@ -367,7 +371,7 @@ export default function ProjectWorkspace() {
                     </div>
                   </div>
 
-                  <div className="col-span-4 space-y-6">
+                  <div className="lg:col-span-4 space-y-6">
                     <div className="bg-surface-container border border-outline-variant p-6 rounded-lg shadow-sm hover:border-primary/20 transition-colors">
                       <div className="flex items-center gap-2 mb-6">
                         <Shield size={16} className="text-primary" />

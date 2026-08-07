@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAccount, useSwitchChain, useWriteContract, usePublicClient } from 'wagmi';
 import { parseEventLogs } from 'viem';
 import { supabase } from '@/lib/supabase';
-import { Shield, Sparkles, Building2, ArrowRight, LayoutDashboard, Search, Bell, User } from 'lucide-react';
+import { Shield, Sparkles, Building2, ArrowRight, LayoutDashboard, Search, Bell, User, Menu } from 'lucide-react';
 import { createProjectOnGenLayer } from '@/lib/genlayer';
 import { vaultFactoryAbi } from '@/lib/abis';
 import { Sidebar } from '@/components/Sidebar';
@@ -23,6 +23,7 @@ export default function CreateProject() {
   const publicClient = usePublicClient();
   const { toast } = useUI();
   const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     hackathon: '',
@@ -109,13 +110,16 @@ export default function CreateProject() {
 
   return (
     <div className="flex min-h-screen bg-background text-on-surface selection:bg-surface-active">
-      <Sidebar />
-      <main className="flex-1 ml-64 flex flex-col min-h-screen relative">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 w-full md:ml-64 flex flex-col min-h-screen relative">
         
         {/* TopAppBar */}
-        <header className="flex justify-between items-center h-16 px-8 sticky top-0 z-10 bg-background border-b border-outline-variant">
-          <div className="flex items-center space-x-4">
-            <h1 className="font-headline text-2xl font-semibold text-primary tracking-tight">New Workspace</h1>
+        <header className="flex justify-between items-center h-14 md:h-16 px-4 md:px-8 sticky top-0 z-30 bg-background border-b border-outline-variant">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="md:hidden p-1.5 -ml-2 text-on-surface hover:bg-surface-variant rounded-md">
+              <Menu size={20} />
+            </button>
+            <h1 className="font-headline text-xl md:text-2xl font-semibold text-primary tracking-tight hidden sm:block">New Workspace</h1>
           </div>
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-3">
@@ -127,7 +131,7 @@ export default function CreateProject() {
         </header>
 
         {/* Content */}
-        <section className="p-8 flex-1 flex flex-col items-center justify-center overflow-y-auto custom-scrollbar animate-slide-up">
+        <section className="p-4 md:p-8 flex-1 flex flex-col items-center justify-center overflow-y-auto custom-scrollbar animate-slide-up">
           <div className="w-full max-w-2xl">
             
             <div className="text-center mb-10">
