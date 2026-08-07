@@ -214,15 +214,15 @@ export default function CreateProject() {
                   <button 
                     type="submit" 
                     disabled={loading} 
-                    className="w-full bg-primary text-on-primary py-3 rounded text-sm font-bold hover:bg-opacity-90 active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg"
+                    className="w-full bg-primary text-on-primary py-3 rounded text-sm font-bold hover:bg-opacity-90 active:scale-[0.99] transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center gap-2 shadow-lg hover:shadow-primary/30"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
                         <span className="w-4 h-4 rounded-full border-2 border-on-primary border-t-transparent animate-spin"></span>
-                        Initializing Dual-Chain Workspace...
+                        Creating Workspace...
                       </span>
                     ) : (
-                      <>Deploy Workspace <ArrowRight size={16} /></>
+                      <>Create Workspace <ArrowRight size={16} /></>
                     )}
                   </button>
                 </div>

@@ -6,6 +6,7 @@ import { Providers } from './providers';
 
 import { Navbar } from '@/components/Navbar';
 import { AuthWrapper } from '@/components/AuthWrapper';
+import { ThemeInit } from '@/components/ThemeInit';
 
 export const metadata: Metadata = {
   title: 'Quota',
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body>
         <Providers>
+          <ThemeInit />
           <Navbar />
           <AuthWrapper>
             {children}

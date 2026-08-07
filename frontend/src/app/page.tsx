@@ -66,10 +66,6 @@ export default function Home() {
         
         {/* Hero Section */}
         <div className="flex flex-col items-center justify-center">
-          <div className="stagger-reveal inline-flex items-center space-x-2 bg-surface-container-low border border-outline-variant/50 rounded-full px-4 py-1.5 mb-8 shadow-sm backdrop-blur-md">
-            <Sparkles size={14} className="text-primary" />
-            <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">The AI Allocation Engine</span>
-          </div>
 
           <h1 className="stagger-reveal text-[clamp(2.5rem,6vw,5.5rem)] font-headline font-black leading-[1.05] tracking-tighter mb-6 text-transparent bg-clip-text bg-gradient-to-br from-on-surface via-on-surface to-on-surface-variant drop-shadow-sm max-w-[900px]">
             Distribute hackathon prizes <br className="hidden md:block" />
