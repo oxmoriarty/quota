@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
+import { useUI } from '@/components/UIProvider';
 
 export default function SubmitEvidencePage({ params }: { params: { id: string } }) {
   const { address } = useAccount();
   const router = useRouter();
+  const { toast } = useUI();
   
   const [formData, setFormData] = useState({
     type: 'Code',
@@ -18,7 +20,7 @@ export default function SubmitEvidencePage({ params }: { params: { id: string } 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address) return alert('Connect wallet first.');
+    if (!address) return toast('Connect wallet first.', 'error');
     setLoading(true);
 
     try {
@@ -34,14 +36,15 @@ export default function SubmitEvidencePage({ params }: { params: { id: string } 
       });
 
       if (res.ok) {
+        toast('Evidence submitted successfully!', 'success');
         router.push(`/projects/${params.id}`);
         router.refresh();
       } else {
-        alert('Failed to submit evidence');
+        toast('Failed to submit evidence', 'error');
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred');
+      toast('An error occurred', 'error');
     } finally {
       setLoading(false);
     }

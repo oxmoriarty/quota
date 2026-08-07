@@ -9,6 +9,7 @@ import { Shield, Sparkles, Building2, ArrowRight, LayoutDashboard, Search, Bell,
 import { createProjectOnGenLayer } from '@/lib/genlayer';
 import { vaultFactoryAbi } from '@/lib/abis';
 import { Sidebar } from '@/components/Sidebar';
+import { useUI } from '@/components/UIProvider';
 import Link from 'next/link';
 
 const GENLAYER_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS || "GLMockContract123";
@@ -20,6 +21,7 @@ export default function CreateProject() {
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
+  const { toast } = useUI();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -31,9 +33,9 @@ export default function CreateProject() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address) return alert("Please connect wallet");
-    if (!publicClient) return alert("Wagmi client not ready");
-    if (!FACTORY_ADDRESS) return alert("Missing Factory Address in env");
+    if (!address) return toast("Please connect wallet", "error");
+    if (!publicClient) return toast("Wagmi client not ready", "error");
+    if (!FACTORY_ADDRESS) return toast("Missing Factory Address in env", "error");
     
     setLoading(true);
     try {
@@ -41,7 +43,7 @@ export default function CreateProject() {
       if (!user) throw new Error("User not found");
 
       // 1. Deploy EVM Vault
-      console.log("Deploying EVM Vault...");
+      toast("Deploying EVM Vault...", "info");
       const TOKENS: Record<string, string> = {
         'ETH': '0x0000000000000000000000000000000000000000',
         'USDC': '0x036CbD53842c5426634e7929541eC2318f3dCF7e', // Base Sepolia Mock
@@ -56,13 +58,12 @@ export default function CreateProject() {
         args: [tokenAddress as `0x${string}`],
       });
       
-      console.log(`Waiting for EVM tx: ${evmTxHash}`);
       const receipt = await publicClient.waitForTransactionReceipt({ hash: evmTxHash });
       const logs = parseEventLogs({ abi: vaultFactoryAbi, logs: receipt.logs, eventName: 'VaultCreated' });
       
       if (!logs || logs.length === 0) throw new Error("Failed to parse VaultCreated event");
       const vaultAddress = logs[0].args.vault;
-      console.log(`EVM Vault Created at: ${vaultAddress}`);
+      toast("EVM Vault Created!", "success");
 
       // 2. Save to Supabase
       const { data, error } = await supabase.from('projects').insert({
@@ -88,7 +89,7 @@ export default function CreateProject() {
       try {
         if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
            if (chainId !== 4221 && switchChainAsync) {
-             console.log("Switching to GenLayer Bradbury...");
+             toast("Switching to GenLayer Bradbury...", "info");
              await switchChainAsync({ chainId: 4221 });
            }
            await createProjectOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, data.id, vaultAddress);
@@ -97,9 +98,10 @@ export default function CreateProject() {
         console.warn("GenLayer registration failed:", err.message);
       }
       
+      toast("Workspace created successfully!", "success");
       router.push(`/project/${data.id}`);
     } catch (err: any) {
-      alert("Error: " + err.message);
+      toast("Error: " + err.message, "error");
     } finally {
       setLoading(false);
     }

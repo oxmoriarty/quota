@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { closeSubmissionsOnGenLayer, startAIEvaluationOnGenLayer, appealOnGenLayer, getProjectFromGenLayer } from '@/lib/genlayer';
 import { Shield, Clock, Users, Zap, FileText, CheckCircle2, ChevronRight, AlertTriangle, ArrowRight, ExternalLink, Activity, Search, Bell, Terminal, Palette, Merge, Plus, Filter, Copy, Trash2 } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
+import { useUI } from '@/components/UIProvider';
 
 const GENLAYER_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS || "GLMockContract123";
 
@@ -15,6 +16,7 @@ export default function ProjectWorkspace() {
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const router = useRouter();
+  const { toast, confirm } = useUI();
 
   const [project, setProject] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
@@ -86,16 +88,18 @@ export default function ProjectWorkspace() {
   };
 
   const handleDeleteEvidence = async (submissionId: string) => {
-    if (!confirm("Are you sure you want to delete this contribution?")) return;
-    try {
-      await supabase.from('submissions').delete().eq('id', submissionId);
-      fetchData();
-    } catch (err) { console.error(err); }
+    confirm("Delete Contribution", "Are you sure you want to delete this contribution?", async () => {
+      try {
+        await supabase.from('submissions').delete().eq('id', submissionId);
+        fetchData();
+        toast("Contribution deleted.", "success");
+      } catch (err) { toast("Failed to delete contribution", "error"); }
+    });
   };
 
   const handleCloseSubmissions = async () => {
     if (!isCreator || !address) return;
-    if (confirm("Are you sure? No new submissions will be accepted.")) {
+    confirm("Close Submissions", "Are you sure? No new submissions will be accepted.", async () => {
       try {
         if (chainId !== 4221) await switchChainAsync({ chainId: 4221 });
         if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
@@ -103,8 +107,9 @@ export default function ProjectWorkspace() {
         }
         await supabase.from('projects').update({ status: 'Submissions Closed' }).eq('id', project.id);
         fetchData();
-      } catch (err: any) { alert("Failed to close submissions: " + err.message); }
-    }
+        toast("Submissions successfully closed.", "success");
+      } catch (err: any) { toast("Failed to close submissions: " + err.message, "error"); }
+    });
   };
 
   const handleEvaluate = async () => {
@@ -122,7 +127,7 @@ export default function ProjectWorkspace() {
       
       if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
          await startAIEvaluationOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id, evidenceUrl, expectedHash);
-         alert("Transaction submitted! Waiting for GenLayer AI Consensus to finalize... (This may take a few seconds)");
+         toast("Evaluation started! Waiting for GenLayer AI Consensus...", "info");
          let attempts = 0;
          const pollInterval = setInterval(async () => {
            try {
@@ -130,26 +135,27 @@ export default function ProjectWorkspace() {
              const glProject = await getProjectFromGenLayer(GENLAYER_CONTRACT_ADDRESS, project.id);
              if (glProject.status === "Allocation Finalized") {
                clearInterval(pollInterval);
-               alert("AI Consensus Reached! Applying allocations.");
+               toast("AI Consensus Reached! Applying allocations.", "success");
                await supabase.from('projects').update({ status: 'Allocation Finalized' }).eq('id', project.id);
                await supabase.from('evaluations').insert({ project_id: project.id, allocations: glProject.allocations, reasoning: "AI Evaluation finalized via GenLayer Consensus.", status: 'Finalized' });
                fetchData();
              } else if (attempts > 20) {
                clearInterval(pollInterval);
-               console.warn("Polling timed out.");
+               toast("Polling timed out. Please refresh later.", "error");
              }
            } catch (err) {}
          }, 5000);
       } else {
          await supabase.from('projects').update({ status: 'Allocation Finalized' }).eq('id', project.id);
+         toast("Evaluation complete.", "success");
          fetchData();
       }
-    } catch (err: any) { alert("Failed to start evaluation: " + err.message); }
+    } catch (err: any) { toast("Failed to start evaluation: " + err.message, "error"); }
   };
 
   const copyInviteLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Project link copied to clipboard! Share it with your team.");
+    toast("Project link copied to clipboard! Share it with your team.", "success");
   };
 
   if (loading) {
@@ -221,7 +227,7 @@ export default function ProjectWorkspace() {
               {/* Page Heading */}
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h1 className="text-3xl font-black tracking-tight text-white mb-2 drop-shadow-sm">Evidence Vault</h1>
+                  <h1 className="text-3xl font-black tracking-tight text-on-surface mb-2 drop-shadow-sm">Evidence Vault</h1>
                   <p className="text-on-surface-variant text-sm max-w-xl">
                     Repository of all technical contributions submitted for verification by the team.
                   </p>
@@ -334,7 +340,7 @@ export default function ProjectWorkspace() {
             <div className="animate-slide-up">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h1 className="text-3xl font-black tracking-tight text-white mb-2 drop-shadow-sm">AI Evaluation</h1>
+                  <h1 className="text-3xl font-black tracking-tight text-on-surface mb-2 drop-shadow-sm">AI Evaluation</h1>
                   <p className="text-on-surface-variant text-sm max-w-xl">
                     GenLayer Consensus output based on algorithmic analysis of the Evidence Vault.
                   </p>
@@ -394,7 +400,7 @@ export default function ProjectWorkspace() {
             <div className="animate-slide-up">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h1 className="text-3xl font-black tracking-tight text-white mb-2 drop-shadow-sm">Team Roster</h1>
+                  <h1 className="text-3xl font-black tracking-tight text-on-surface mb-2 drop-shadow-sm">Team Roster</h1>
                   <p className="text-on-surface-variant text-sm max-w-xl">
                     Members currently collaborating on this project.
                   </p>

@@ -30,6 +30,8 @@ const config = createConfig(
   })
 );
 
+import { UIProvider } from '@/components/UIProvider';
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -60,7 +62,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
               "--ck-accent-text-color": "var(--color-on-primary)",
             }}
           >
-            {children}
+            <UIProvider>
+              {children}
+            </UIProvider>
           </ConnectKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

@@ -3,12 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Search, Bell, User, Plus, Filter, ArrowUpDown, MoreHorizontal, Activity, Timer } from 'lucide-react';
+import { Activity, Bell, FileText, Search, Zap, Clock, Shield, CheckCircle2, AlertTriangle, Filter, Plus, ArrowRight, User, ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
+import { useUI } from '@/components/UIProvider';
 
 export default function DashboardPage() {
   const { address } = useAccount();
+  const router = useRouter();
+  const { toast } = useUI();
+  
   const [user, setUser] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +117,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <button onClick={() => alert("No new notifications")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
+              <button onClick={() => toast("No new notifications", "info")} className="p-2 text-on-surface-variant hover:text-primary hover:bg-primary/10 rounded transition-all focus:ring-2 focus:ring-primary/20">
                 <Bell size={20} />
               </button>
               <Link href="/create" className="bg-primary text-on-primary px-4 py-1.5 rounded text-sm font-semibold hover:bg-opacity-90 transition-all shadow-sm flex items-center gap-2">
