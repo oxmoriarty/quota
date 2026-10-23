@@ -87,16 +87,15 @@ export default function CreateProject() {
       });
 
       // 3. Register on GenLayer
-      try {
-        if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
-           if (chainId !== 4221 && switchChainAsync) {
-             toast("Switching to GenLayer Bradbury...", "info");
-             await switchChainAsync({ chainId: 4221 });
-           }
-           await createProjectOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, data.id, vaultAddress);
+      if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
+        try {
+          toast("Registering on GenLayer...", "info");
+          await createProjectOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, data.id, vaultAddress);
+        } catch (err: any) {
+          console.error("GenLayer registration failed:", err.message);
+          toast("Failed to register on GenLayer. You may need to create a new workspace.", "error");
+          throw new Error("GenLayer registration failed: " + err.message);
         }
-      } catch (err: any) {
-        console.warn("GenLayer registration failed:", err.message);
       }
       
       toast("Workspace created successfully!", "success");

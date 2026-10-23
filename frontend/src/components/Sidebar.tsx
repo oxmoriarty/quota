@@ -41,10 +41,10 @@ export function Sidebar({ isOpen, onClose }: { isOpen?: boolean, onClose?: () =>
         <div className="h-14 md:h-16 w-full flex items-center justify-between px-4 border-b border-transparent relative">
           <Link href="/" className="flex items-center group relative translate-y-2 md:translate-y-0" onClick={onClose}>
             <div className="hidden dark:block">
-              <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-[160px] md:w-auto h-auto md:h-[70px]" priority />
+              <Image src="/quotalogo.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-[112px] md:w-auto h-auto md:h-[70px]" priority />
             </div>
             <div className="block dark:hidden">
-              <Image src="/quotalogoblack.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-[160px] md:w-auto h-auto md:h-[70px]" priority />
+              <Image src="/quotalogoblack.svg" alt="Quota Logo" width={220} height={70} className="drop-shadow-lg object-contain w-[112px] md:w-auto h-auto md:h-[70px]" priority />
             </div>
           </Link>
           {isOpen && (

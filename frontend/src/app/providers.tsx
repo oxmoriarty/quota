@@ -7,24 +7,31 @@ import { baseSepolia, sepolia } from 'wagmi/chains';
 import { defineChain } from 'viem';
 import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
 
-export const genlayerBradbury = defineChain({
-  id: 4221,
-  name: 'GenLayer Testnet Bradbury',
-  nativeCurrency: { name: 'GenLayer Token', symbol: 'GEN', decimals: 18 },
+export const genlayerStudionet = defineChain({
+  id: 61999,
+  name: 'Genlayer Studio Network',
+  nativeCurrency: { name: 'GEN Token', symbol: 'GEN', decimals: 18 },
   rpcUrls: {
-    default: { http: ['https://rpc-bradbury.genlayer.com'] },
+    default: { http: ['https://studio.genlayer.com/api'] },
   },
+  blockExplorers: {
+    default: {
+      name: 'GenLayer Explorer',
+      url: 'https://genlayer-explorer.vercel.app',
+    },
+  },
+  testnet: true,
 });
 import { useState } from 'react';
 
 const config = createConfig(
   getDefaultConfig({
     appName: 'Quota',
-    chains: [baseSepolia, sepolia, genlayerBradbury],
+    chains: [baseSepolia, sepolia, genlayerStudionet],
     transports: {
       [baseSepolia.id]: http(),
       [sepolia.id]: http(),
-      [genlayerBradbury.id]: http(),
+      [genlayerStudionet.id]: http(),
     },
     walletConnectProjectId: 'YOUR_PROJECT_ID',
   })

@@ -45,6 +45,18 @@ export async function GET(
       return NextResponse.json({ error: 'Project ID is required' }, { status: 400 });
     }
 
+    // Fetch project details for context
+    const { data: project, error: projError } = await supabase
+      .from('projects')
+      .select('name, description')
+      .eq('id', projectId)
+      .single();
+      
+    if (projError) {
+      console.error("Supabase Project Error:", projError);
+      throw projError;
+    }
+
     // Fetch submissions with the user's wallet address
     const { data: submissions, error } = await supabase
       .from('submissions')
@@ -63,7 +75,12 @@ export async function GET(
     }
 
     if (!submissions || submissions.length === 0) {
-      return NextResponse.json([]);
+      // Still return the project context even if no submissions
+      return NextResponse.json({
+        project_name: project?.name || "Unknown",
+        project_description: project?.description || "No description provided.",
+        submissions: []
+      });
     }
 
     // Format for the GenLayer LLM prompt
@@ -74,7 +91,11 @@ export async function GET(
       links: sub.evidence_urls
     }));
 
-    return NextResponse.json(formattedEvidence);
+    return NextResponse.json({
+      project_name: project?.name || "Unknown",
+      project_description: project?.description || "No description provided.",
+      submissions: formattedEvidence
+    });
     
   } catch (error: any) {
     console.error('Evidence API Error:', error);

@@ -17,10 +17,10 @@ export function Navbar() {
         <div className="flex items-center h-full">
           <Link href="/" className="flex items-center group absolute -bottom-1.5 sm:-bottom-2 translate-y-0">
             <div className="hidden dark:block">
-              <Image src="/quotalogo.svg" alt="Quota Logo" width={240} height={76} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-[110px] h-auto sm:w-auto sm:h-[76px]" priority />
+              <Image src="/quotalogo.svg" alt="Quota Logo" width={240} height={76} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-[77px] h-auto sm:w-auto sm:h-[76px]" priority />
             </div>
             <div className="block dark:hidden">
-              <Image src="/quotalogoblack.svg" alt="Quota Logo" width={240} height={76} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-[110px] h-auto sm:w-auto sm:h-[76px]" priority />
+              <Image src="/quotalogoblack.svg" alt="Quota Logo" width={240} height={76} className="transition-transform group-hover:scale-105 drop-shadow-md object-contain w-[77px] h-auto sm:w-auto sm:h-[76px]" priority />
             </div>
           </Link>
         </div>

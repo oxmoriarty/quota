@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useAccount, useSwitchChain } from 'wagmi';
+import { useAccount, useSwitchChain, useWriteContract, usePublicClient } from 'wagmi';
 import { supabase } from '@/lib/supabase';
-import { closeSubmissionsOnGenLayer, startAIEvaluationOnGenLayer, appealOnGenLayer, getProjectFromGenLayer } from '@/lib/genlayer';
-import { Shield, Clock, Users, Zap, FileText, CheckCircle2, ChevronRight, AlertTriangle, ArrowRight, ExternalLink, Activity, Search, Bell, Terminal, Palette, Merge, Plus, Filter, Copy, Trash2, Menu } from 'lucide-react';
+import { closeSubmissionsOnGenLayer, startAIEvaluationOnGenLayer, appealOnGenLayer, getProjectFromGenLayer, getGenLayerTransactionStatus } from '@/lib/genlayer';
+import { vaultAbi } from '@/lib/abis';
+import { Shield, Clock, Users, Zap, FileText, CheckCircle2, ChevronRight, AlertTriangle, ArrowRight, ExternalLink, Activity, Search, Bell, Terminal, Palette, Merge, Plus, Filter, Copy, Trash2, Menu, Coins, RotateCcw } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 import { useUI } from '@/components/UIProvider';
 
@@ -15,6 +16,8 @@ export default function ProjectWorkspace() {
   const { id } = useParams();
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
+  const { writeContractAsync } = useWriteContract();
+  const publicClient = usePublicClient();
   const router = useRouter();
   const { toast, confirm } = useUI();
 
@@ -23,6 +26,7 @@ export default function ProjectWorkspace() {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [evaluations, setEvaluations] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [distributing, setDistributing] = useState(false);
   
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'evidence' | 'evaluation' | 'team'>('evidence');
@@ -39,6 +43,63 @@ export default function ProjectWorkspace() {
   useEffect(() => {
     fetchData();
   }, [id, address]);
+
+  // Persistent Polling for Evaluating state
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
+    if ((project?.status === 'Evaluating' || project?.status === 'Appeal in Progress') && GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
+      const checkGenLayer = async () => {
+        try {
+          // Check transaction status on-chain if gl_tx_hash is present
+          if (project.gl_tx_hash) {
+            const receipt = await getGenLayerTransactionStatus(project.gl_tx_hash);
+            if (receipt && (receipt.status === '0x0' || receipt.status === 0 || receipt.status === 'reverted' || receipt.status === 'FAILED')) {
+              toast("GenLayer evaluation transaction reverted or failed on-chain.", "error");
+              await supabase.from('projects').update({ status: 'Evaluation Failed' }).eq('id', project.id);
+              fetchData();
+              return;
+            }
+          }
+
+          const glProject = await getProjectFromGenLayer(GENLAYER_CONTRACT_ADDRESS, project.id);
+          
+          if (project?.status === 'Evaluating' && glProject.status === "Allocation Finalized") {
+            if (Array.isArray(glProject.allocations) && glProject.allocations.length > 0) {
+              toast("AI Consensus Reached! Applying verified allocations.", "success");
+              await supabase.from('projects').update({ status: 'Allocation Finalized' }).eq('id', project.id);
+              await supabase.from('evaluations').insert({
+                project_id: project.id,
+                allocations: glProject.allocations,
+                reasoning: "AI Evaluation finalized via GenLayer Consensus based on verified source contributions.",
+                status: 'Finalized'
+              });
+              fetchData();
+            }
+          } else if (project?.status === 'Appeal in Progress' && glProject.status === "Appeal Resolved") {
+            if (Array.isArray(glProject.allocations) && glProject.allocations.length > 0) {
+              toast("Appeal Evaluation Complete! Updating allocations.", "success");
+              await supabase.from('projects').update({ status: 'Appeal Resolved' }).eq('id', project.id);
+              await supabase.from('evaluations').update({
+                allocations: glProject.allocations,
+                reasoning: "AI Appeal finalized via GenLayer Consensus after re-verifying contribution sources."
+              }).eq('project_id', project.id);
+              fetchData();
+            }
+          }
+        } catch (err: any) {
+          console.error("Error checking GenLayer status", err);
+        }
+      };
+      
+      checkGenLayer();
+      intervalId = setInterval(checkGenLayer, 30000);
+    }
+    
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [project?.status, project?.id, project?.gl_tx_hash]);
 
   async function fetchData() {
     if (!id || !address) return;
@@ -102,8 +163,8 @@ export default function ProjectWorkspace() {
     if (!isCreator || !address) return;
     confirm("Close Submissions", "Are you sure? No new submissions will be accepted.", async () => {
       try {
-        if (chainId !== 4221) await switchChainAsync({ chainId: 4221 });
         if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
+           toast("Confirming on GenLayer...", "info");
            await closeSubmissionsOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id);
         }
         await supabase.from('projects').update({ status: 'Submissions Closed' }).eq('id', project.id);
@@ -116,6 +177,10 @@ export default function ProjectWorkspace() {
   const handleEvaluate = async () => {
     if (!isCreator || !address) return;
     try {
+      if (!GENLAYER_CONTRACT_ADDRESS || GENLAYER_CONTRACT_ADDRESS === 'GLMockContract123') {
+        throw new Error("GenLayer Intelligent Contract is not configured. Please set NEXT_PUBLIC_GENLAYER_CONTRACT_ADDRESS in .env.local.");
+      }
+
       const res = await fetch(`/api/projects/${project.id}/evidence`);
       const evidenceText = await res.text();
       
@@ -124,34 +189,100 @@ export default function ProjectWorkspace() {
       
       const evidenceUrl = `${window.location.origin}/api/projects/${project.id}/evidence`;
       
-      if (chainId !== 4221) await switchChainAsync({ chainId: 4221 });
+      toast("Submitting evaluation to GenLayer...", "info");
+      const txHash = await startAIEvaluationOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id, evidenceUrl, expectedHash);
+      toast("Evaluation started on GenLayer! You can safely leave the page.", "info");
       
-      if (GENLAYER_CONTRACT_ADDRESS && GENLAYER_CONTRACT_ADDRESS !== 'GLMockContract123') {
-         await startAIEvaluationOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id, evidenceUrl, expectedHash);
-         toast("Evaluation started! Waiting for GenLayer AI Consensus...", "info");
-         let attempts = 0;
-         const pollInterval = setInterval(async () => {
-           try {
-             attempts++;
-             const glProject = await getProjectFromGenLayer(GENLAYER_CONTRACT_ADDRESS, project.id);
-             if (glProject.status === "Allocation Finalized") {
-               clearInterval(pollInterval);
-               toast("AI Consensus Reached! Applying allocations.", "success");
-               await supabase.from('projects').update({ status: 'Allocation Finalized' }).eq('id', project.id);
-               await supabase.from('evaluations').insert({ project_id: project.id, allocations: glProject.allocations, reasoning: "AI Evaluation finalized via GenLayer Consensus.", status: 'Finalized' });
-               fetchData();
-             } else if (attempts > 20) {
-               clearInterval(pollInterval);
-               toast("Polling timed out. Please refresh later.", "error");
-             }
-           } catch (err) {}
-         }, 5000);
-      } else {
-         await supabase.from('projects').update({ status: 'Allocation Finalized' }).eq('id', project.id);
-         toast("Evaluation complete.", "success");
-         fetchData();
+      // Update status to Evaluating and record transaction hash
+      try {
+        await supabase.from('projects').update({ status: 'Evaluating', gl_tx_hash: txHash }).eq('id', project.id);
+      } catch {
+        await supabase.from('projects').update({ status: 'Evaluating' }).eq('id', project.id);
       }
-    } catch (err: any) { toast("Failed to start evaluation: " + err.message, "error"); }
+      fetchData();
+    } catch (err: any) { 
+      toast("Failed to start evaluation: " + err.message, "error"); 
+    }
+  };
+
+  const handleAppeal = async () => {
+    if (!isMember || !address) return;
+    confirm("Start Appeal", "This will trigger GenLayer AI consensus to re-crawl all evidence links and re-evaluate allocations. Proceed with appeal?", async () => {
+      try {
+        if (!GENLAYER_CONTRACT_ADDRESS || GENLAYER_CONTRACT_ADDRESS === 'GLMockContract123') {
+          throw new Error("GenLayer Intelligent Contract is not configured.");
+        }
+
+        const res = await fetch(`/api/projects/${project.id}/evidence`);
+        const evidenceText = await res.text();
+        
+        const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(evidenceText));
+        const expectedHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        const evidenceUrl = `${window.location.origin}/api/projects/${project.id}/evidence`;
+        
+        toast("Submitting Appeal to GenLayer...", "info");
+        const txHash = await appealOnGenLayer(GENLAYER_CONTRACT_ADDRESS, address, project.id, evidenceUrl, expectedHash);
+        toast("Appeal started on GenLayer! You can safely leave the page.", "info");
+        
+        try {
+          await supabase.from('projects').update({ status: 'Appeal in Progress', gl_tx_hash: txHash }).eq('id', project.id);
+        } catch {
+          await supabase.from('projects').update({ status: 'Appeal in Progress' }).eq('id', project.id);
+        }
+        fetchData();
+      } catch (err: any) { 
+        toast("Failed to start appeal: " + err.message, "error"); 
+      }
+    });
+  };
+
+  const handlePayout = async () => {
+    if (!project?.vault_address) return toast("No EVM Vault address linked to this project", "error");
+    if (!address) return toast("Please connect your wallet", "error");
+
+    confirm("Distribute Prize Pool", "This will execute the on-chain payout from the EVM Vault based strictly on the finalized GenLayer allocation. Proceed?", async () => {
+      setDistributing(true);
+      try {
+        toast("Fetching verified GenLayer allocation and oracle signature...", "info");
+        const res = await fetch(`/api/projects/${project.id}/payout-signature`);
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to generate payout signature");
+        }
+
+        toast("Submitting distribution transaction to EVM Vault...", "info");
+        const evmTxHash = await writeContractAsync({
+          address: project.vault_address as `0x${string}`,
+          abi: vaultAbi,
+          functionName: 'distribute',
+          args: [
+            data.recipients,
+            data.percentages.map((p: string) => BigInt(p)),
+            data.signature as `0x${string}`
+          ],
+        });
+
+        toast("Waiting for EVM transaction confirmation...", "info");
+        if (publicClient) {
+          await publicClient.waitForTransactionReceipt({ hash: evmTxHash });
+        }
+
+        toast("Prize Pool distributed successfully!", "success");
+        try {
+          await supabase.from('projects').update({ status: 'Paid Out', payout_tx_hash: evmTxHash }).eq('id', project.id);
+        } catch {
+          await supabase.from('projects').update({ status: 'Paid Out' }).eq('id', project.id);
+        }
+        fetchData();
+      } catch (err: any) {
+        console.error("Payout error:", err);
+        toast("Payout failed: " + (err.shortMessage || err.message), "error");
+      } finally {
+        setDistributing(false);
+      }
+    });
   };
 
   const copyInviteLink = () => {
@@ -201,10 +332,20 @@ export default function ProjectWorkspace() {
                   Close Submissions
                 </button>
               )}
-              {isCreator && project.status === 'Submissions Closed' && (
-                <button onClick={handleEvaluate} className="bg-primary text-on-primary px-4 py-1.5 rounded text-xs font-bold hover:opacity-90 hover:scale-[1.02] active:scale-95 hover:shadow-lg hover:shadow-primary/30 transition-all">
-                  Run AI Evaluation
+              {isCreator && (project.status === 'Submissions Closed' || project.status === 'Evaluation Failed') && (
+                <button onClick={handleEvaluate} className="bg-primary text-on-primary px-4 py-1.5 rounded text-xs font-bold hover:opacity-90 hover:scale-[1.02] active:scale-95 hover:shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-1.5">
+                  {project.status === 'Evaluation Failed' ? <><RotateCcw size={13} /> Retry Evaluation</> : 'Run AI Evaluation'}
                 </button>
+              )}
+              {(project.status === 'Allocation Finalized' || project.status === 'Appeal Resolved') && (
+                <button onClick={handlePayout} disabled={distributing} className="bg-emerald-600 text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-emerald-500 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1.5 shadow-md">
+                  <Coins size={14} /> {distributing ? 'Distributing...' : 'Distribute Prize'}
+                </button>
+              )}
+              {project.status === 'Paid Out' && (
+                <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1.5">
+                  <CheckCircle2 size={13} /> Paid Out
+                </span>
               )}
             </div>
           </div>
@@ -351,7 +492,36 @@ export default function ProjectWorkspace() {
                 </div>
               </div>
 
-              {evaluations.length === 0 ? (
+              {project?.status === 'Evaluating' || project?.status === 'Appeal in Progress' ? (
+                 <div className="p-12 text-center bg-surface-container-low border border-primary/30 rounded-lg shadow-lg relative overflow-hidden">
+                   <div className="absolute top-0 left-0 w-full h-1 bg-primary/20">
+                     <div className="h-full bg-primary animate-pulse w-1/3 rounded-full"></div>
+                   </div>
+                   <Activity className="mx-auto mb-6 text-primary animate-bounce" size={40} />
+                   <h3 className="text-xl font-black text-on-surface mb-3 tracking-tight">
+                     {project?.status === 'Appeal in Progress' ? 'Evaluating Appeal on GenLayer...' : 'Evaluating Contributions on GenLayer...'}
+                   </h3>
+                   <p className="text-sm text-on-surface-variant max-w-md mx-auto leading-relaxed">
+                     The GenLayer Intelligent Contract is currently crawling the Evidence Vault and verifying all external links. 
+                     <br/><br/>
+                     <span className="font-bold text-primary">This Non-Deterministic process runs on decentralized AI validators.</span> 
+                     <br/>You may safely leave this page and check back later. We will automatically sync the results once consensus is reached.
+                   </p>
+                 </div>
+              ) : project?.status === 'Evaluation Failed' ? (
+                 <div className="p-12 text-center bg-surface-container-low border border-error/30 rounded-lg shadow-lg">
+                   <AlertTriangle className="mx-auto mb-4 text-error" size={40} />
+                   <h3 className="text-xl font-black text-on-surface mb-2 tracking-tight">Evaluation Failed On-Chain</h3>
+                   <p className="text-sm text-on-surface-variant max-w-md mx-auto mb-6 leading-relaxed">
+                     The GenLayer AI validator consensus failed to reach a finalized outcome or reverted. Your submissions and vault remain completely intact.
+                   </p>
+                   {isCreator && (
+                     <button onClick={handleEvaluate} className="bg-primary text-on-primary px-5 py-2 rounded-lg text-xs font-bold hover:opacity-90 transition-all inline-flex items-center gap-2">
+                       <RotateCcw size={14} /> Retry AI Evaluation
+                     </button>
+                   )}
+                 </div>
+              ) : evaluations.length === 0 ? (
                  <div className="p-12 text-center bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm">
                    <Activity className="mx-auto mb-4 text-on-surface-variant opacity-50" size={32} />
                    <h3 className="text-lg font-bold text-on-surface mb-2">Awaiting Consensus</h3>
@@ -373,9 +543,29 @@ export default function ProjectWorkspace() {
 
                   <div className="lg:col-span-4 space-y-6">
                     <div className="bg-surface-container border border-outline-variant p-6 rounded-lg shadow-sm hover:border-primary/20 transition-colors">
-                      <div className="flex items-center gap-2 mb-6">
-                        <Shield size={16} className="text-primary" />
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Prize Allocations</h3>
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                          <Shield size={16} className="text-primary" />
+                          <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Prize Allocations</h3>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isMember && project?.status === 'Allocation Finalized' && (
+                            <button onClick={handleAppeal} className="bg-surface-variant hover:bg-error/10 hover:text-error text-on-surface-variant text-xs font-bold px-3 py-1.5 rounded transition-all">
+                              Appeal Evaluation
+                            </button>
+                          )}
+                          {(project?.status === 'Allocation Finalized' || project?.status === 'Appeal Resolved') && (
+                            <button onClick={handlePayout} disabled={distributing} className="bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-emerald-500 transition-all flex items-center gap-1 shadow-sm">
+                              <Coins size={12} /> {distributing ? 'Distributing...' : 'Payout'}
+                            </button>
+                          )}
+                          {project?.status === 'Appeal Resolved' && (
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Appeal Resolved</span>
+                          )}
+                          {project?.status === 'Paid Out' && (
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Paid Out</span>
+                          )}
+                        </div>
                       </div>
                       <div className="space-y-4">
                         {evaluations[0].allocations.map((alloc: any, i: number) => {

@@ -67,9 +67,9 @@ export default function Home() {
         {/* Hero Section */}
         <div className="flex flex-col items-center justify-center">
 
-          <h1 className="stagger-reveal text-[clamp(2.5rem,6vw,5.5rem)] font-headline font-black leading-[1.05] tracking-tighter mb-6 text-transparent bg-clip-text bg-gradient-to-br from-on-surface via-on-surface to-on-surface-variant drop-shadow-sm max-w-[900px]">
-            Distribute hackathon prizes <br className="hidden md:block" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-tertiary opacity-90">without the arguments.</span>
+          <h1 className="stagger-reveal text-[clamp(2.2rem,4.4vw,5.2rem)] font-headline font-black leading-[1.08] tracking-tighter mb-6 text-transparent bg-clip-text bg-gradient-to-br from-on-surface via-on-surface to-on-surface-variant drop-shadow-sm max-w-5xl mx-auto">
+            <span className="md:block md:whitespace-nowrap">Distribute hackathon prizes</span>
+            <span className="md:block md:whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r from-primary to-tertiary opacity-90">without the arguments.</span>
           </h1>
           
           <p className="stagger-reveal text-lg md:text-xl text-on-surface-variant max-w-[650px] mx-auto mb-12 leading-relaxed font-medium">
